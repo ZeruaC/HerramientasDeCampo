@@ -60,13 +60,13 @@ export const useCatalog = () => {
       .then(res => res.json())
       .then(data => {
         // Extraer familias
-        const catalogo = data.catalogo_eternity_completo;
+        const catalogo = data.catalogo_eternity_completo as { familias: { [key: string]: Familia } };
         setFamilias(catalogo.familias);
 
         // Extraer todos los modelos en array plano
         const allModelos: Modelo[] = [];
-        Object.values(catalogo.familias).forEach((familia: Familia) => {
-          Object.values(familia.subfamilias).forEach((subfamilia: Subfamilia) => {
+        Object.values(catalogo.familias).forEach((familia) => {
+          Object.values(familia.subfamilias).forEach((subfamilia) => {
             allModelos.push(...subfamilia.modelos);
           });
         });
