@@ -1,0 +1,141 @@
+import { create } from 'zustand';
+
+interface StoreState {
+  // H1 Data
+  clientName: string;
+  setClientName: (name: string) => void;
+  sector: string;
+  setSector: (sector: string) => void;
+  outageHoursPerWeek: number;
+  setOutageHoursPerWeek: (hours: number) => void;
+  affectedLines: number;
+  setAffectedLines: (lines: number) => void;
+  costPerHour: number;
+  setCostPerHour: (cost: number) => void;
+  fixedCostPerIncident: number;
+  setFixedCostPerIncident: (cost: number) => void;
+  incidentsPerWeek: number;
+  setIncidentsPerWeek: (incidents: number) => void;
+
+  // H2 Data
+  maxTemp: string;
+  setMaxTemp: (temp: string) => void;
+  autonomyReqH2: string;
+  setAutonomyReqH2: (autonomy: string) => void;
+  maintenanceAvailable: string;
+  setMaintenanceAvailable: (maint: string) => void;
+  operationType: string;
+  setOperationType: (op: string) => void;
+  availableSpace: string;
+  setAvailableSpace: (space: string) => void;
+  recommendedFamily: string;
+  setRecommendedFamily: (family: string) => void;
+
+  // H3 Data
+  genericCapex: number;
+  setGenericCapex: (capex: number) => void;
+  genericLife: number;
+  setGenericLife: (life: number) => void;
+  genericMaint: number;
+  setGenericMaint: (maint: number) => void;
+  genericInstall: number;
+  setGenericInstall: (install: number) => void;
+  
+  eternityCapex: number;
+  setEternityCapex: (capex: number) => void;
+  eternityLife: number;
+  setEternityLife: (life: number) => void;
+  eternityMaint: number;
+  setEternityMaint: (maint: number) => void;
+  eternityInstall: number;
+  setEternityInstall: (install: number) => void;
+
+  // H4 Data
+  loadPowerW: number;
+  setLoadPowerW: (power: number) => void;
+  autonomyReqH4: number;
+  setAutonomyReqH4: (autonomy: number) => void;
+  systemVoltage: number;
+  setSystemVoltage: (voltage: number) => void;
+  minTempH4: number;
+  setMinTempH4: (temp: number) => void;
+  selectedFamilyH4: string;
+  setSelectedFamilyH4: (family: string) => void;
+  maxDod: number;
+  setMaxDod: (dod: number) => void;
+  inverterEfficiency: number;
+  setInverterEfficiency: (eff: number) => void;
+  
+  selectedModelH4: string;
+  setSelectedModelH4: (model: string) => void;
+}
+
+export const useStore = create<StoreState>((set) => ({
+  // H1
+  clientName: '',
+  setClientName: (name) => set({ clientName: name }),
+  sector: '',
+  setSector: (sector) => set({ sector }),
+  outageHoursPerWeek: 0,
+  setOutageHoursPerWeek: (hours) => set({ outageHoursPerWeek: hours }),
+  affectedLines: 0,
+  setAffectedLines: (lines) => set({ affectedLines: lines }),
+  costPerHour: 0,
+  setCostPerHour: (cost) => set({ costPerHour: cost }),
+  fixedCostPerIncident: 0,
+  setFixedCostPerIncident: (cost) => set({ fixedCostPerIncident: cost }),
+  incidentsPerWeek: 0,
+  setIncidentsPerWeek: (incidents) => set({ incidentsPerWeek: incidents }),
+
+  // H2
+  maxTemp: '25-35°C',
+  setMaxTemp: (temp) => set({ maxTemp: temp }),
+  autonomyReqH2: '>8 h',
+  setAutonomyReqH2: (autonomy) => set({ autonomyReqH2: autonomy }),
+  maintenanceAvailable: 'No',
+  setMaintenanceAvailable: (maint) => set({ maintenanceAvailable: maint }),
+  operationType: 'Standby/Flotación (UPS)',
+  setOperationType: (op) => set({ operationType: op }),
+  availableSpace: 'Reducido o sin ventilación',
+  setAvailableSpace: (space) => set({ availableSpace: space }),
+  recommendedFamily: '',
+  setRecommendedFamily: (family) => set({ recommendedFamily: family }),
+
+  // H3
+  genericCapex: 0,
+  setGenericCapex: (capex) => set({ genericCapex: capex }),
+  genericLife: 0,
+  setGenericLife: (life) => set({ genericLife: life }),
+  genericMaint: 0,
+  setGenericMaint: (maint) => set({ genericMaint: maint }),
+  genericInstall: 0,
+  setGenericInstall: (install) => set({ genericInstall: install }),
+
+  eternityCapex: 0,
+  setEternityCapex: (capex) => set({ eternityCapex: capex }),
+  eternityLife: 0,
+  setEternityLife: (life) => set({ eternityLife: life }),
+  eternityMaint: 0,
+  setEternityMaint: (maint) => set({ eternityMaint: maint }),
+  eternityInstall: 0,
+  setEternityInstall: (install) => set({ eternityInstall: install }),
+
+  // H4
+  loadPowerW: 3000,
+  setLoadPowerW: (power) => set({ loadPowerW: power }),
+  autonomyReqH4: 8,
+  setAutonomyReqH4: (autonomy) => set({ autonomyReqH4: autonomy }),
+  systemVoltage: 48,
+  setSystemVoltage: (voltage) => set({ systemVoltage: voltage }),
+  minTempH4: 25,
+  setMinTempH4: (temp) => set({ minTempH4: temp }),
+  selectedFamilyH4: 'OPzV Standby',
+  setSelectedFamilyH4: (family) => set({ selectedFamilyH4: family }),
+  maxDod: 0.8,
+  setMaxDod: (dod) => set({ maxDod: dod }),
+  inverterEfficiency: 0.9,
+  setInverterEfficiency: (eff) => set({ inverterEfficiency: eff }),
+  
+  selectedModelH4: '',
+  setSelectedModelH4: (model) => set({ selectedModelH4: model }),
+}));
