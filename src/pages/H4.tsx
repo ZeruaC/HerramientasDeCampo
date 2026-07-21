@@ -280,20 +280,27 @@ export const H4 = () => {
             </div>
             <div className="p-6 space-y-6">
               
-              <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center p-4 bg-gray-50 rounded-lg border">
+              <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Modelo Sugerido (Menor que cumple)</p>
-                  <p className="text-lg font-semibold text-gray-700">{calcResults.suggestedModel}</p>
+                  <p className="text-sm text-blue-600 font-semibold mb-1">💡 Modelo Sugerido</p>
+                  <p className="text-lg font-bold text-blue-800">{calcResults.suggestedModel}</p>
+                  <p className="text-xs text-blue-600 mt-1">Mínimo que cumple los requisitos</p>
                 </div>
                 <div className="w-full md:w-1/2">
-                  <label className="block text-sm text-gray-500 mb-1">Modelo Elegido (Editable)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Modelo Elegido (Cambiar si prefieres)</label>
                   <select
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500 bg-white font-semibold text-gray-800"
-                    value={selectedModelH4}
+                    className={`w-full p-2 border-2 rounded-md bg-white font-semibold text-gray-800 ${
+                      selectedModelH4 === calcResults.suggestedModel
+                        ? 'border-blue-500 focus:ring-blue-500'
+                        : 'border-gray-300 focus:ring-orange-500'
+                    }`}
+                    value={selectedModelH4 || calcResults.suggestedModel}
                     onChange={(e) => setSelectedModelH4(e.target.value)}
                   >
                     {catalogoArray.filter(p => p.familia.includes(selectedFamilyH4) || p.subfamilia === selectedFamilyH4).map(m => (
-                      <option key={m.modelo} value={m.modelo}>{m.modelo} ({m.ah} Ah)</option>
+                      <option key={m.modelo} value={m.modelo}>
+                        {m.modelo} ({m.ah} Ah) {m.modelo === calcResults.suggestedModel ? '✓ Sugerido' : ''}
+                      </option>
                     ))}
                   </select>
                 </div>
