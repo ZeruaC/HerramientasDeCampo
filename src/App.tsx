@@ -90,17 +90,17 @@ const Home = () => (
 const SidebarLink = ({ to, icon: Icon, children }: { to: string, icon: any, children: React.ReactNode }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
-  
+
   return (
-    <Link 
-      to={to} 
+    <Link
+      to={to}
       className={`flex items-center gap-3 p-3 rounded-md transition-colors ${
-        isActive 
-          ? 'bg-blue-50 text-blue-700 font-medium' 
-          : 'text-gray-600 hover:bg-gray-100'
+        isActive
+          ? 'bg-green-500/20 text-green-300 font-medium'
+          : 'text-slate-400 hover:bg-slate-700/50'
       }`}
     >
-      <Icon className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+      <Icon className={`w-5 h-5 ${isActive ? 'text-green-400' : 'text-slate-500'}`} />
       <span>{children}</span>
     </Link>
   );
@@ -109,29 +109,39 @@ const SidebarLink = ({ to, icon: Icon, children }: { to: string, icon: any, chil
 function App() {
   return (
     <Router>
-      <div className="flex h-screen bg-gray-100">
-        <aside className="w-64 bg-white shadow-md flex flex-col h-full z-10">
-          <div className="p-5 border-b">
-            <Link to="/" className="flex items-center gap-2 text-xl font-bold text-gray-800">
-              <Layout className="w-6 h-6 text-blue-600" />
+      <div className="flex h-screen bg-gray-50">
+        {/* Sidebar */}
+        <aside className="w-64 bg-gradient-to-b from-slate-900 to-slate-800 shadow-lg flex flex-col h-full z-10">
+          {/* Header con logos */}
+          <div className="p-4 border-b border-slate-700">
+            <div className="flex items-center justify-between mb-4">
+              <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-8 object-contain" />
+              <img src="/logos/eternity-logo.png" alt="Eternity" className="h-8 object-contain" />
+            </div>
+            <Link to="/" className="flex items-center gap-2 text-lg font-bold text-white">
+              <Layout className="w-6 h-6 text-green-400" />
               <span>Eternity Tools</span>
             </Link>
           </div>
-          <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+          <nav className="flex-1 overflow-y-auto p-3 space-y-1">
             <SidebarLink to="/" icon={Layout}>Inicio</SidebarLink>
-            <div className="pt-4 pb-2">
-              <p className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Herramientas</p>
+            <div className="pt-3 pb-2">
+              <p className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Herramientas</p>
             </div>
             <SidebarLink to="/catalogo" icon={Battery}>Catálogo</SidebarLink>
             <SidebarLink to="/h1" icon={FileText}>H1 · Dolor Cliente</SidebarLink>
             <SidebarLink to="/h2" icon={Settings}>H2 · Selector Familia</SidebarLink>
             <SidebarLink to="/h3" icon={BarChart3}>H3 · TCO</SidebarLink>
             <SidebarLink to="/h4" icon={Wrench}>H4 · Dimensionador</SidebarLink>
-            <SidebarLink to="/h5" icon={FileCheck}>H5 · Checklist</SidebarLink>
-            <SidebarLink to="/h6" icon={Presentation}>H6 · Propuesta ROI</SidebarLink>
+            <SidebarLink to="/h5" icon={FileCheck}>H5 · Propuesta</SidebarLink>
+            <SidebarLink to="/h6" icon={Presentation}>H6 · Checklist</SidebarLink>
           </nav>
+          {/* Favicon Balore en esquina inferior */}
+          <div className="p-3 border-t border-slate-700 flex justify-center">
+            <img src="/logos/balore-favicon.png" alt="Balore" className="h-6 object-contain opacity-75" />
+          </div>
         </aside>
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-white">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/catalogo" element={<Catalogo />} />
