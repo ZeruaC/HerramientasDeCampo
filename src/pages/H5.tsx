@@ -1,10 +1,29 @@
-import { useState, useMemo, useEffect, Fragment } from 'react';
+import { useState, useMemo, useEffect, Fragment, useRef } from 'react';
+import html2pdf from 'html2pdf.js';
 
 import { ClipboardCheck, Check, X, Printer } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 export const H5 = () => {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isExporting, setIsExporting] = useState(false);
   const { clientName, selectedModelH4 } = useStore();
+
+  const handleExportPDF = () => {
+    if (!contentRef.current) return;
+    setIsExporting(true);
+
+    const element = contentRef.current;
+    const options = {
+      margin: 10,
+      filename: `Checklist-${clientName || 'Cliente'}-${new Date().toISOString().split('T')[0]}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    };
+
+    html2pdf().set(options).from(element).save().finally(() => setIsExporting(false));
+  };
   
   // Local state for the checklist specific fields
   const [checklistData, setChecklistData] = useState({
@@ -93,11 +112,17 @@ export const H5 = () => {
             Documento que activa la cobertura de fábrica. Completar en la puesta en marcha, firmar y adjuntar al expediente de garantía.
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded shadow-sm hover:bg-gray-50 transition print:hidden">
+        <button
+          onClick={handleExportPDF}
+          disabled={isExporting}
+          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-4 py-2 rounded shadow-sm transition print:hidden"
+        >
           <Printer className="w-4 h-4" />
-          <span>Imprimir / PDF</span>
+          <span>{isExporting ? 'Exportando...' : 'Descargar PDF'}</span>
         </button>
       </div>
+
+      <div ref={contentRef}>
 
       <div className="bg-white rounded-lg shadow-md border mb-8">
         <div className="bg-gray-50 px-6 py-4 border-b">
@@ -237,6 +262,7 @@ export const H5 = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

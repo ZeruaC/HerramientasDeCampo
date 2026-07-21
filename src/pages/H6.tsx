@@ -1,10 +1,14 @@
-import { useState, useMemo, useEffect, Fragment } from 'react';
+import { useState, useMemo, useEffect, Fragment, useRef } from 'react';
+import html2pdf from 'html2pdf.js';
 
 import { useStore } from '../store/useStore';
 import { useCatalog } from '../hooks/useCatalog';
 import { Presentation, Building, Battery, TrendingUp, ArrowRight, Download } from 'lucide-react';
 
 export const H6 = () => {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isExporting, setIsExporting] = useState(false);
+
   const {
     clientName, sector,
     outageHoursPerWeek, affectedLines, costPerHour, fixedCostPerIncident, incidentsPerWeek,
@@ -14,6 +18,22 @@ export const H6 = () => {
   } = useStore();
 
   const { modelos, loading } = useCatalog();
+
+  const handleExportPDF = () => {
+    if (!contentRef.current) return;
+    setIsExporting(true);
+
+    const element = contentRef.current;
+    const options = {
+      margin: 10,
+      filename: `Propuesta-${clientName || 'Cliente'}-${new Date().toISOString().split('T')[0]}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    };
+
+    html2pdf().set(options).from(element).save().finally(() => setIsExporting(false));
+  };
 
   // Re-calculate H1
   const weeklyLoss = (outageHoursPerWeek * affectedLines * costPerHour) + (incidentsPerWeek * fixedCostPerIncident);
@@ -47,11 +67,17 @@ export const H6 = () => {
             Resumen ejecutivo para {clientName || 'Cliente'} — Confidencial
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md shadow-sm transition print:hidden">
+        <button
+          onClick={handleExportPDF}
+          disabled={isExporting}
+          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md shadow-sm transition print:hidden"
+        >
           <Download className="w-4 h-4" />
-          <span>Exportar a PDF</span>
+          <span>{isExporting ? 'Exportando...' : 'Exportar a PDF'}</span>
         </button>
       </div>
+
+      <div ref={contentRef}>
 
       <div className="space-y-8">
         {/* 1. Cliente y Situación Actual */}
@@ -162,6 +188,7 @@ export const H6 = () => {
             <p className="text-xs text-gray-500 mt-8 border-t border-gray-400 pt-1 inline-block w-48 text-center">Firma Asesor / Comercial</p>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
