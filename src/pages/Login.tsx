@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogIn } from 'lucide-react';
 
 export function Login() {
   const { signIn, signUp } = useAuth();
@@ -36,77 +35,118 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-md p-8">
-        <div className="flex justify-center mb-6">
-          <LogIn className="w-10 h-10 text-blue-600" />
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-slate-800 via-slate-700 to-slate-900 flex flex-col">
+      {/* Header con logos */}
+      <div className="flex justify-between items-center px-8 py-6">
+        <img src="/logos/balore-favicon.png" alt="Balore" className="h-10 object-contain" />
+        <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-12 object-contain" />
+        <img src="/logos/eternity-logo.png" alt="Eternity" className="h-10 object-contain" />
+      </div>
 
-        <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">Herramientas Eternity</h1>
-        <p className="text-center text-gray-600 mb-6">
-          {isLogin ? 'Inicia sesión en tu cuenta' : 'Crea una nueva cuenta'}
-        </p>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
-              <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
+      {/* Main content */}
+      <div className="flex-1 flex items-center justify-center px-8">
+        <div className="grid grid-cols-2 gap-12 w-full max-w-6xl items-center">
+          {/* Left side - Image placeholder */}
+          <div className="hidden lg:block">
+            <div className="bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl overflow-hidden shadow-2xl h-96 flex items-center justify-center border border-slate-500">
+              <img
+                src="/logos/eternity-logo.png"
+                alt="Professional"
+                className="h-48 object-contain opacity-50"
               />
             </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
+          {/* Right side - Form */}
+          <div className="w-full max-w-md mx-auto">
+            <div className="bg-white rounded-xl shadow-2xl p-10">
+              <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">
+                HERRAMIENTAS DE CAMPO
+              </h1>
+              <p className="text-center text-gray-600 font-semibold mb-8">
+                PARA PROFESIONALES
+              </p>
+
+              <p className="text-center text-gray-700 text-sm mb-6">
+                {isLogin ? 'Inicia sesión en tu cuenta' : 'Crea una nueva cuenta'}
+              </p>
+
+              {error && (
+                <div className={`${error.includes('creada') ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'} border px-4 py-3 rounded-lg mb-6 text-sm`}>
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {!isLogin && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre Completo</label>
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Contraseña</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-lg transition-colors mt-6"
+                >
+                  {loading ? 'Procesando...' : (isLogin ? 'Iniciar Sesión' : 'Registrarse')}
+                </button>
+              </form>
+
+              <div className="mt-8 text-center">
+                <p className="text-gray-600 text-sm mb-2">
+                  {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
+                </p>
+                <button
+                  onClick={() => {
+                    setIsLogin(!isLogin);
+                    setError('');
+                  }}
+                  className="text-blue-600 hover:text-blue-700 font-semibold text-sm"
+                >
+                  {isLogin ? 'Regístrate aquí' : 'Inicia sesión aquí'}
+                </button>
+              </div>
+            </div>
+
+            <p className="text-center text-slate-400 text-xs mt-6">
+              Versión 3.0 · 2026-07-18 · Material de formación interno
+            </p>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 rounded-lg transition-colors"
-          >
-            {loading ? 'Procesando...' : (isLogin ? 'Iniciar Sesión' : 'Registrarse')}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-600 hover:text-blue-700 font-medium"
-          >
-            {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
-          </button>
         </div>
       </div>
+
+      {/* Footer bar */}
+      <div className="h-16 bg-gradient-to-r from-green-400 via-teal-400 to-cyan-400"></div>
     </div>
   );
 }
