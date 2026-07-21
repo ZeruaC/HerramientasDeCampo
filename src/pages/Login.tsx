@@ -37,23 +37,34 @@ export function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-800 via-slate-700 to-slate-900 flex flex-col">
       {/* Header con logos */}
-      <div className="flex justify-between items-center px-8 py-6">
-        <img src="/logos/balore-favicon.png" alt="Balore" className="h-10 object-contain" />
-        <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-12 object-contain" />
-        <img src="/logos/eternity-logo.png" alt="Eternity" className="h-10 object-contain" />
+      <div className="flex justify-between items-center px-8 py-6 gap-4">
+        <img src="/logos/balore-logo.png" alt="Balore" className="h-12 object-contain" />
+        <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-16 object-contain" />
+        <img src="/logos/eternity-logo.png" alt="Eternity" className="h-14 object-contain" />
       </div>
 
       {/* Main content */}
       <div className="flex-1 flex items-center justify-center px-8">
-        <div className="grid grid-cols-2 gap-12 w-full max-w-6xl items-center">
-          {/* Left side - Image placeholder */}
+        <div className="grid grid-cols-2 gap-16 w-full max-w-7xl items-center">
+          {/* Left side - Professional image */}
           <div className="hidden lg:block">
-            <div className="bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl overflow-hidden shadow-2xl h-96 flex items-center justify-center border border-slate-500">
-              <img
-                src="/logos/eternity-logo.png"
-                alt="Professional"
-                className="h-48 object-contain opacity-50"
-              />
+            <div
+              className="rounded-xl overflow-hidden shadow-2xl h-[500px] bg-cover bg-center border-4 border-slate-500"
+              style={{
+                backgroundImage: 'linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.7) 100%), url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 500%27%3E%3Cdefs%3E%3ClinearGradient id=%27grad%27 x1=%270%25%27 y1=%270%25%27 x2=%27100%25%27 y2=%27100%25%27%3E%3Cstop offset=%270%25%27 style=%27stop-color:%2338444d;stop-opacity:1%27 /%3E%3Cstop offset=%27100%25%27 style=%27stop-color:%231e2938;stop-opacity:1%27 /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%27400%27 height=%27500%27 fill=%27url(%23grad)%27/%3E%3Ccircle cx=%27100%27 cy=%27100%27 r=%2750%27 fill=%27%234a9eff%27 opacity=%270.1%27/%3E%3Ccircle cx=%27350%27 cy=%27450%27 r=%27100%27 fill=%27%234a9eff%27 opacity=%270.05%27/%3E%3Crect x=%2750%27 y=%27150%27 width=%27300%27 height=%27200%27 fill=%27%232d3e52%27 rx=%2710%27/%3E%3Ctext x=%27200%27 y=%27240%27 font-size=%2724%27 text-anchor=%27middle%27 fill=%27%234a9eff%27 font-weight=%27bold%27%3ESoluciones%3C/text%3E%3Ctext x=%27200%27 y=%27270%27 font-size=%2720%27 text-anchor=%27middle%27 fill=%27%23a0c4ff%27%3Ede Respaldo%3C/text%3E%3C/svg%3E")',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            >
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-center">
+                  <svg className="w-32 h-32 mx-auto text-blue-400 opacity-40 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <p className="text-slate-400 text-lg font-semibold">Energía Confiable</p>
+                  <p className="text-slate-500 text-sm mt-2">Soluciones Profesionales</p>
+                </div>
+              </div>
             </div>
           </div>
 
