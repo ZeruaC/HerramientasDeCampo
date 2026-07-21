@@ -23,9 +23,12 @@ export function Login() {
         await signIn(email, password);
       } else {
         await signUp(email, password, fullName);
+        setError('Cuenta creada. Por favor inicia sesión.');
+        setTimeout(() => setIsLogin(true), 1500);
       }
       navigate('/');
     } catch (err: any) {
+      console.error('Auth error:', err);
       setError(err.message || 'Error de autenticación');
     } finally {
       setLoading(false);
