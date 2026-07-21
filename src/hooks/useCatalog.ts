@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
 
 export interface Modelo {
   familia: string;
@@ -56,28 +57,67 @@ export const useCatalog = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/data/ETERNITY_CATALOGO_FINAL.json')
-      .then(res => res.json())
-      .then(data => {
-        // Extraer familias
-        const catalogo = data.catalogo_eternity_completo as { familias: { [key: string]: Familia } };
-        setFamilias(catalogo.familias);
-
-        // Extraer todos los modelos en array plano
-        const allModelos: Modelo[] = [];
-        Object.values(catalogo.familias).forEach((familia) => {
-          Object.values(familia.subfamilias).forEach((subfamilia) => {
-            allModelos.push(...subfamilia.modelos);
-          });
-        });
-        setModelos(allModelos);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
+    loadProductsFromSupabase();
   }, []);
+
+  const loadProductsFromSupabase = async () => {
+    try {
+      const { data, error: dbError } = await supabase
+        .from('products')
+        .select('model_name, familia, subfamilia, specifications')
+        .order('subfamilia', { ascending: true });
+
+      if (dbError) throw dbError;
+
+      if (!data || data.length === 0) {
+        setError('No products found in database');
+        setLoading(false);
+        return;
+      }
+
+      // Transform database rows to Modelo format
+      const allModelos: Modelo[] = data.map((product: any) => ({
+        familia: product.familia,
+        subfamilia: product.subfamilia,
+        modelo: product.model_name,
+        especificaciones: product.specifications?.especificaciones || {},
+        capacidades_crate: product.specifications?.capacidades_crate,
+        ciclos: product.specifications?.ciclos,
+        estado: product.specifications?.estado
+      }));
+
+      // Build familias structure from modelos
+      const familiasObj: { [key: string]: Familia } = {};
+
+      allModelos.forEach((modelo) => {
+        if (!familiasObj[modelo.familia]) {
+          familiasObj[modelo.familia] = {
+            nombre: modelo.familia,
+            subfamilias: {}
+          };
+        }
+
+        if (!familiasObj[modelo.familia].subfamilias[modelo.subfamilia]) {
+          familiasObj[modelo.familia].subfamilias[modelo.subfamilia] = {
+            nombre: modelo.subfamilia,
+            total_modelos: 0,
+            modelos: []
+          };
+        }
+
+        familiasObj[modelo.familia].subfamilias[modelo.subfamilia].modelos.push(modelo);
+        familiasObj[modelo.familia].subfamilias[modelo.subfamilia].total_modelos++;
+      });
+
+      setModelos(allModelos);
+      setFamilias(familiasObj);
+      setLoading(false);
+    } catch (err: any) {
+      console.error('Error loading products from Supabase:', err);
+      setError(err.message || 'Error loading products');
+      setLoading(false);
+    }
+  };
 
   // Métodos útiles
   const getSubfamiliasByFamilia = (familia: string): string[] => {
