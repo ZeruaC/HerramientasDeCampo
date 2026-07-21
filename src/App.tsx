@@ -138,8 +138,8 @@ function App() {
           </div>
         </aside>
         <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 relative">
-          {/* Logo PELSA - Esquina superior izquierda */}
-          <div className="absolute top-4 left-4 h-14 z-20 pointer-events-none">
+          {/* Logo PELSA - Esquina superior izquierda (+25%) */}
+          <div className="absolute top-4 left-4 h-20 z-20 pointer-events-none">
             <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-full object-contain opacity-80" />
           </div>
 
