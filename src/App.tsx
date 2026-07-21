@@ -4,9 +4,11 @@ import { H4 } from './pages/H4';
 import { H3 } from './pages/H3';
 import { H2 } from './pages/H2';
 import { H1 } from './pages/H1';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Layout, Battery, FileText, Settings, BarChart3, Wrench, FileCheck, Presentation } from 'lucide-react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import { Layout, Battery, FileText, Settings, BarChart3, Wrench, FileCheck, Presentation, LogOut } from 'lucide-react';
 import { Catalogo } from './pages/Catalogo';
+import { Login } from './pages/Login';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Placeholder components for pages
 const Home = () => (
@@ -106,65 +108,98 @@ const SidebarLink = ({ to, icon: Icon, children }: { to: string, icon: any, chil
   );
 };
 
+function AppContent() {
+  const { user, signOut, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-slate-900">
+        <div className="text-white">Cargando...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Login />;
+  }
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <aside className="w-64 bg-gradient-to-b from-slate-900 to-slate-800 shadow-lg flex flex-col h-full z-10">
+        {/* Header */}
+        <div className="p-4 border-b border-slate-700">
+          <Link to="/" className="flex items-center gap-2 text-lg font-bold text-white">
+            <Layout className="w-6 h-6 text-green-400" />
+            <span>Herramientas de Campo</span>
+          </Link>
+        </div>
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          <SidebarLink to="/" icon={Layout}>Inicio</SidebarLink>
+          <div className="pt-3 pb-2">
+            <p className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Herramientas</p>
+          </div>
+          <SidebarLink to="/catalogo" icon={Battery}>Catálogo</SidebarLink>
+          <SidebarLink to="/h1" icon={FileText}>H1 · Dolor Cliente</SidebarLink>
+          <SidebarLink to="/h2" icon={Settings}>H2 · Selector Familia</SidebarLink>
+          <SidebarLink to="/h3" icon={BarChart3}>H3 · TCO</SidebarLink>
+          <SidebarLink to="/h4" icon={Wrench}>H4 · Dimensionador</SidebarLink>
+          <SidebarLink to="/h5" icon={FileCheck}>H5 · Propuesta</SidebarLink>
+          <SidebarLink to="/h6" icon={Presentation}>H6 · Checklist</SidebarLink>
+        </nav>
+        {/* User info and logout */}
+        <div className="p-3 border-t border-slate-700 space-y-3">
+          <div className="text-xs text-slate-400 truncate">{user.email}</div>
+          <button
+            onClick={signOut}
+            className="w-full flex items-center gap-2 text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            Salir
+          </button>
+          <div className="flex justify-center">
+            <img src="/logos/balore-favicon.png" alt="Balore" className="h-6 object-contain opacity-75" />
+          </div>
+        </div>
+      </aside>
+      <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 relative">
+        {/* Logo PELSA - Esquina superior izquierda (+25%) */}
+        <div className="absolute top-4 left-4 h-20 z-20 pointer-events-none">
+          <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-full object-contain opacity-80" />
+        </div>
+
+        {/* Logo Eternity - Esquina superior derecha */}
+        <div className="absolute top-4 right-4 h-14 z-20 pointer-events-none">
+          <img src="/logos/eternity-logo.png" alt="Eternity" className="h-full object-contain opacity-80" />
+        </div>
+
+        {/* Logo Balore - Esquina inferior derecha */}
+        <div className="absolute bottom-4 right-4 h-12 z-20 pointer-events-none">
+          <img src="/logos/balore-logo.png" alt="Balore" className="h-full object-contain opacity-70" />
+        </div>
+
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/catalogo" element={<Catalogo />} />
+          <Route path="/h1" element={<H1 />} />
+          <Route path="/h2" element={<H2 />} />
+          <Route path="/h3" element={<H3 />} />
+          <Route path="/h4" element={<H4 />} />
+          <Route path="/h5" element={<H5 />} />
+          <Route path="/h6" element={<H6 />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
 function App() {
   return (
     <Router>
-      <div className="flex h-screen bg-gray-50">
-        {/* Sidebar */}
-        <aside className="w-64 bg-gradient-to-b from-slate-900 to-slate-800 shadow-lg flex flex-col h-full z-10">
-          {/* Header */}
-          <div className="p-4 border-b border-slate-700">
-            <Link to="/" className="flex items-center gap-2 text-lg font-bold text-white">
-              <Layout className="w-6 h-6 text-green-400" />
-              <span>Herramientas de Campo</span>
-            </Link>
-          </div>
-          <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-            <SidebarLink to="/" icon={Layout}>Inicio</SidebarLink>
-            <div className="pt-3 pb-2">
-              <p className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Herramientas</p>
-            </div>
-            <SidebarLink to="/catalogo" icon={Battery}>Catálogo</SidebarLink>
-            <SidebarLink to="/h1" icon={FileText}>H1 · Dolor Cliente</SidebarLink>
-            <SidebarLink to="/h2" icon={Settings}>H2 · Selector Familia</SidebarLink>
-            <SidebarLink to="/h3" icon={BarChart3}>H3 · TCO</SidebarLink>
-            <SidebarLink to="/h4" icon={Wrench}>H4 · Dimensionador</SidebarLink>
-            <SidebarLink to="/h5" icon={FileCheck}>H5 · Propuesta</SidebarLink>
-            <SidebarLink to="/h6" icon={Presentation}>H6 · Checklist</SidebarLink>
-          </nav>
-          {/* Favicon Balore en esquina inferior */}
-          <div className="p-3 border-t border-slate-700 flex justify-center">
-            <img src="/logos/balore-favicon.png" alt="Balore" className="h-6 object-contain opacity-75" />
-          </div>
-        </aside>
-        <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 relative">
-          {/* Logo PELSA - Esquina superior izquierda (+25%) */}
-          <div className="absolute top-4 left-4 h-20 z-20 pointer-events-none">
-            <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-full object-contain opacity-80" />
-          </div>
-
-          {/* Logo Eternity - Esquina superior derecha */}
-          <div className="absolute top-4 right-4 h-14 z-20 pointer-events-none">
-            <img src="/logos/eternity-logo.png" alt="Eternity" className="h-full object-contain opacity-80" />
-          </div>
-
-          {/* Logo Balore - Esquina inferior derecha */}
-          <div className="absolute bottom-4 right-4 h-12 z-20 pointer-events-none">
-            <img src="/logos/balore-logo.png" alt="Balore" className="h-full object-contain opacity-70" />
-          </div>
-
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/catalogo" element={<Catalogo />} />
-            <Route path="/h1" element={<H1 />} />
-            <Route path="/h2" element={<H2 />} />
-            <Route path="/h3" element={<H3 />} />
-            <Route path="/h4" element={<H4 />} />
-            <Route path="/h5" element={<H5 />} />
-            <Route path="/h6" element={<H6 />} />
-          </Routes>
-        </main>
-      </div>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 }
