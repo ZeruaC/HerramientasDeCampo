@@ -1,13 +1,53 @@
 import { useState, useMemo, useEffect, Fragment, useRef } from 'react';
 import html2pdf from 'html2pdf.js';
 
-import { ClipboardCheck, Check, X, Printer } from 'lucide-react';
+import { ClipboardCheck, Check, X, Printer, Save } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 
 export const H6 = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+  const [proposalNumber, setProposalNumber] = useState('');
   const { clientName, selectedModelH4 } = useStore();
+  const { user } = useAuth();
+
+  const handleSaveChecklist = async () => {
+    if (!proposalNumber) {
+      setSaveMessage('⚠️ Ingresa el número de propuesta (PROP-...)');
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveMessage('');
+
+    try {
+      const { data, error } = await supabase
+        .from('proposals')
+        .update({
+          status: isApto ? 'accepted' : 'draft',
+          updated_at: new Date().toISOString()
+        })
+        .eq('proposal_number', proposalNumber)
+        .eq('user_id', user?.id)
+        .select();
+
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        setSaveMessage('❌ Propuesta no encontrada');
+        return;
+      }
+
+      setSaveMessage(`✅ Checklist guardado - Estado: ${isApto ? 'APTO' : 'PENDIENTE'}`);
+    } catch (err: any) {
+      setSaveMessage(`❌ Error: ${err.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleExportPDF = () => {
     if (!contentRef.current) return;
@@ -16,7 +56,7 @@ export const H6 = () => {
     const element = contentRef.current;
     const options: any = {
       margin: 10,
-      filename: `Checklist-${clientName || 'Cliente'}-${new Date().toISOString().split('T')[0]}.pdf`,
+      filename: `${proposalNumber || 'Checklist'}-${clientName || 'Cliente'}.pdf`,
       image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
@@ -112,14 +152,27 @@ export const H6 = () => {
             Documento que activa la cobertura de fábrica. Completar en la puesta en marcha, firmar y adjuntar al expediente de garantía.
           </p>
         </div>
-        <button
-          onClick={handleExportPDF}
-          disabled={isExporting}
-          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-4 py-2 rounded shadow-sm transition print:hidden"
-        >
-          <Printer className="w-4 h-4" />
-          <span>{isExporting ? 'Exportando...' : 'Descargar PDF'}</span>
-        </button>
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={handleSaveChecklist}
+            disabled={isSaving}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded shadow-sm transition print:hidden"
+          >
+            <Save className="w-4 h-4" />
+            <span>{isSaving ? 'Guardando...' : 'Guardar Checklist'}</span>
+          </button>
+          <button
+            onClick={handleExportPDF}
+            disabled={isExporting}
+            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-4 py-2 rounded shadow-sm transition print:hidden"
+          >
+            <Printer className="w-4 h-4" />
+            <span>{isExporting ? 'Exportando...' : 'Descargar PDF'}</span>
+          </button>
+          {saveMessage && (
+            <p className="text-xs text-center">{saveMessage}</p>
+          )}
+        </div>
       </div>
 
       <div ref={contentRef}>
@@ -132,6 +185,16 @@ export const H6 = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
             <input type="text" className="w-full p-2 border border-gray-300 rounded" value={clientName} readOnly />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nº Propuesta (PROP-...)</label>
+            <input
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded bg-blue-50"
+              placeholder="PROP-YYYY-MM-DD-###"
+              value={proposalNumber}
+              onChange={e => setProposalNumber(e.target.value)}
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Técnico instalador</label>
