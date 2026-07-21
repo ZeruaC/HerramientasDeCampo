@@ -3,11 +3,19 @@ import html2pdf from 'html2pdf.js';
 
 import { useStore } from '../store/useStore';
 import { useCatalog } from '../hooks/useCatalog';
-import { Presentation, Building, Battery, TrendingUp, ArrowRight, Download } from 'lucide-react';
+import { useProposals } from '../hooks/useProposals';
+import { useAuth } from '../context/AuthContext';
+import { Presentation, Building, Battery, TrendingUp, ArrowRight, Download, Save } from 'lucide-react';
 
 export const H5 = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [proposalNumber, setProposalNumber] = useState('');
+  const [saveMessage, setSaveMessage] = useState('');
+
+  const { user } = useAuth();
+  const { saveProposal } = useProposals();
 
   const {
     clientName, sector,
@@ -19,6 +27,38 @@ export const H5 = () => {
 
   const { modelos, loading } = useCatalog();
 
+  const handleSaveProposal = async () => {
+    if (!clientName) {
+      setSaveMessage('Por favor ingresa el nombre del cliente en H1');
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveMessage('');
+
+    try {
+      const propNum = await saveProposal(clientName, {
+        sector: sector || undefined,
+        outage_hours_per_week: outageHoursPerWeek || undefined,
+        affected_lines: affectedLines || undefined,
+        cost_per_hour: costPerHour || undefined,
+        annual_loss: annualLoss,
+        recommended_family: recommendedFamily || undefined,
+        eternity_capex: eternityCapex || undefined,
+        system_voltage: systemVoltage || undefined,
+        selected_model: selectedModelH4 || undefined,
+        autonomy_hours: autonomyReqH4 || undefined,
+      });
+
+      setProposalNumber(propNum);
+      setSaveMessage(`✅ Propuesta guardada: ${propNum}`);
+    } catch (err: any) {
+      setSaveMessage(`❌ Error: ${err.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleExportPDF = () => {
     if (!contentRef.current) return;
     setIsExporting(true);
@@ -26,7 +66,7 @@ export const H5 = () => {
     const element = contentRef.current;
     const options: any = {
       margin: 10,
-      filename: `Propuesta-${clientName || 'Cliente'}-${new Date().toISOString().split('T')[0]}.pdf`,
+      filename: `${proposalNumber || 'Propuesta'}-${clientName || 'Cliente'}.pdf`,
       image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
@@ -66,15 +106,33 @@ export const H5 = () => {
           <p className="text-gray-500 mt-2">
             Resumen ejecutivo para {clientName || 'Cliente'} — Confidencial
           </p>
+          {proposalNumber && (
+            <p className="text-green-600 font-semibold mt-1">
+              Propuesta: {proposalNumber}
+            </p>
+          )}
         </div>
-        <button
-          onClick={handleExportPDF}
-          disabled={isExporting}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md shadow-sm transition print:hidden"
-        >
-          <Download className="w-4 h-4" />
-          <span>{isExporting ? 'Exportando...' : 'Exportar a PDF'}</span>
-        </button>
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={handleSaveProposal}
+            disabled={isSaving}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md shadow-sm transition print:hidden"
+          >
+            <Save className="w-4 h-4" />
+            <span>{isSaving ? 'Guardando...' : 'Guardar Propuesta'}</span>
+          </button>
+          <button
+            onClick={handleExportPDF}
+            disabled={isExporting}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md shadow-sm transition print:hidden"
+          >
+            <Download className="w-4 h-4" />
+            <span>{isExporting ? 'Exportando...' : 'Exportar a PDF'}</span>
+          </button>
+          {saveMessage && (
+            <p className="text-xs mt-2 text-center">{saveMessage}</p>
+          )}
+        </div>
       </div>
 
       <div ref={contentRef}>
