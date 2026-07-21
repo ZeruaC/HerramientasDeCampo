@@ -138,13 +138,13 @@ function App() {
           </div>
         </aside>
         <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 relative">
-          {/* Logo PELSA - Esquina superior izquierda (+12%) */}
-          <div className="absolute top-4 left-4 h-12 z-20 pointer-events-none">
+          {/* Logo PELSA - Esquina superior izquierda */}
+          <div className="absolute top-4 left-4 h-14 z-20 pointer-events-none">
             <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-full object-contain opacity-80" />
           </div>
 
           {/* Logo Eternity - Esquina superior derecha */}
-          <div className="absolute top-4 right-4 h-10 z-20 pointer-events-none">
+          <div className="absolute top-4 right-4 h-14 z-20 pointer-events-none">
             <img src="/logos/eternity-logo.png" alt="Eternity" className="h-full object-contain opacity-80" />
           </div>
 
