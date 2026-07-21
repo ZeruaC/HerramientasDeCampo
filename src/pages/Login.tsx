@@ -37,10 +37,12 @@ export function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-900 via-slate-800 to-slate-900 flex flex-col">
       {/* Header con logos */}
-      <div className="flex justify-between items-center px-8 py-6 gap-4">
-        <img src="/logos/balore-logo.png" alt="Balore" className="h-14 object-contain" />
-        <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-16 object-contain" />
-        <img src="/logos/eternity-logo.png" alt="Eternity" className="h-14 object-contain" />
+      <div className="border-b-2 border-cyan-200">
+        <div className="flex justify-between items-center px-8 py-6 gap-4">
+          <img src="/logos/balore-logo.png" alt="Balore" className="h-16 object-contain" />
+          <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-16 object-contain" />
+          <img src="/logos/eternity-logo.png" alt="Eternity" className="h-16 object-contain" />
+        </div>
       </div>
 
       {/* Main content */}
@@ -137,11 +139,17 @@ export function Login() {
                 </button>
               </div>
             </div>
-
-            <p className="text-center text-slate-400 text-xs mt-6">
-              Versión 3.0 · 2026-07-18 · Material de formación interno
-            </p>
           </div>
+        </div>
+
+        {/* Version and Copyright - Centered below containers */}
+        <div className="text-center mt-8">
+          <p className="text-slate-300 text-xs">
+            Versión 3.0 · 2026-07-18 · Material de formación interno
+          </p>
+          <p className="text-slate-400 text-xs mt-1">
+            © 2026 Balore Engineering. Todos los derechos reservados.
+          </p>
         </div>
       </div>
 
