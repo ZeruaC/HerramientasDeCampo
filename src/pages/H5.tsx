@@ -14,10 +14,10 @@ export const H5 = () => {
     setIsExporting(true);
 
     const element = contentRef.current;
-    const options = {
+    const options: any = {
       margin: 10,
       filename: `Checklist-${clientName || 'Cliente'}-${new Date().toISOString().split('T')[0]}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
     };
