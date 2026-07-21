@@ -38,17 +38,17 @@ export function Login() {
     <div className="min-h-screen bg-gradient-to-b from-blue-900 via-slate-800 to-slate-900 flex flex-col">
       {/* Header con logos */}
       <div className="flex justify-between items-center px-8 py-6 gap-4">
-        <img src="/logos/balore-logo.png" alt="Balore" className="h-12 object-contain" />
+        <img src="/logos/balore-logo.png" alt="Balore" className="h-14 object-contain" />
         <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-16 object-contain" />
         <img src="/logos/eternity-logo.png" alt="Eternity" className="h-14 object-contain" />
       </div>
 
       {/* Main content */}
       <div className="flex-1 flex items-center justify-center px-8">
-        <div className="grid grid-cols-2 gap-16 w-full max-w-7xl items-center">
+        <div className="grid grid-cols-2 gap-16 w-full max-w-7xl items-stretch">
           {/* Left side - Professional image */}
           <div>
-            <div className="rounded-xl overflow-hidden shadow-2xl h-[500px] border-4 border-slate-500">
+            <div className="rounded-xl overflow-hidden shadow-2xl h-full border-4 border-slate-500">
               <img
                 src="/logos/technician.png"
                 alt="Técnico profesional"
@@ -58,8 +58,8 @@ export function Login() {
           </div>
 
           {/* Right side - Form */}
-          <div className="w-full max-w-md mx-auto">
-            <div className="bg-white rounded-xl shadow-2xl p-10">
+          <div className="flex items-center justify-center">
+            <div className="bg-white rounded-xl shadow-2xl p-10 w-full">
               <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">
                 HERRAMIENTAS DE CAMPO
               </h1>
