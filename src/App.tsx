@@ -112,12 +112,8 @@ function App() {
       <div className="flex h-screen bg-gray-50">
         {/* Sidebar */}
         <aside className="w-64 bg-gradient-to-b from-slate-900 to-slate-800 shadow-lg flex flex-col h-full z-10">
-          {/* Header con logos */}
+          {/* Header */}
           <div className="p-4 border-b border-slate-700">
-            <div className="flex items-center justify-between mb-4">
-              <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-8 object-contain" />
-              <img src="/logos/eternity-logo.png" alt="Eternity" className="h-8 object-contain" />
-            </div>
             <Link to="/" className="flex items-center gap-2 text-lg font-bold text-white">
               <Layout className="w-6 h-6 text-green-400" />
               <span>Eternity Tools</span>
@@ -141,7 +137,22 @@ function App() {
             <img src="/logos/balore-favicon.png" alt="Balore" className="h-6 object-contain opacity-75" />
           </div>
         </aside>
-        <main className="flex-1 overflow-y-auto bg-white">
+        <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 relative">
+          {/* Logo PELSA - Esquina superior izquierda */}
+          <div className="absolute top-4 left-4 h-10 z-20 pointer-events-none">
+            <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-full object-contain opacity-80" />
+          </div>
+
+          {/* Logo Eternity - Esquina superior derecha */}
+          <div className="absolute top-4 right-4 h-10 z-20 pointer-events-none">
+            <img src="/logos/eternity-logo.png" alt="Eternity" className="h-full object-contain opacity-80" />
+          </div>
+
+          {/* Logo Balore - Esquina inferior derecha */}
+          <div className="absolute bottom-4 right-4 h-8 z-20 pointer-events-none">
+            <img src="/logos/balore-favicon.png" alt="Balore" className="h-full object-contain opacity-60" />
+          </div>
+
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/catalogo" element={<Catalogo />} />
