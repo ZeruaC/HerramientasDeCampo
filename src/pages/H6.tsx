@@ -1,23 +1,13 @@
 import { useState, useMemo, useEffect, Fragment, useRef } from 'react';
 import html2pdf from 'html2pdf.js';
 
+import { ClipboardCheck, Check, X, Printer } from 'lucide-react';
 import { useStore } from '../store/useStore';
-import { useCatalog } from '../hooks/useCatalog';
-import { Presentation, Building, Battery, TrendingUp, ArrowRight, Download } from 'lucide-react';
 
 export const H6 = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
-
-  const {
-    clientName, sector,
-    outageHoursPerWeek, affectedLines, costPerHour, fixedCostPerIncident, incidentsPerWeek,
-    recommendedFamily,
-    eternityCapex, genericCapex, genericLife, genericMaint, genericInstall, eternityLife, eternityMaint, eternityInstall,
-    systemVoltage, selectedModelH4, autonomyReqH4
-  } = useStore();
-
-  const { modelos, loading } = useCatalog();
+  const { clientName, selectedModelH4 } = useStore();
 
   const handleExportPDF = () => {
     if (!contentRef.current) return;
@@ -26,7 +16,7 @@ export const H6 = () => {
     const element = contentRef.current;
     const options: any = {
       margin: 10,
-      filename: `Propuesta-${clientName || 'Cliente'}-${new Date().toISOString().split('T')[0]}.pdf`,
+      filename: `Checklist-${clientName || 'Cliente'}-${new Date().toISOString().split('T')[0]}.pdf`,
       image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
@@ -34,158 +24,242 @@ export const H6 = () => {
 
     html2pdf().set(options).from(element).save().finally(() => setIsExporting(false));
   };
+  
+  // Local state for the checklist specific fields
+  const [checklistData, setChecklistData] = useState({
+    ubicacion: '',
+    fecha: new Date().toISOString().split('T')[0],
+    tecnico: '',
+    cantidad: '',
+    serie: ''
+  });
 
-  // Re-calculate H1
-  const weeklyLoss = (outageHoursPerWeek * affectedLines * costPerHour) + (incidentsPerWeek * fixedCostPerIncident);
-  const annualLoss = weeklyLoss * 52;
-  const fiveYearLoss = annualLoss * 5;
+  const handleDataChange = (field: string, value: string) => {
+    setChecklistData((prev: any) => ({ ...prev, [field]: value }));
+  };
 
-  // Re-calculate H3 (10 years)
-  const calcReplacements = (horizon: number, life: number) => Math.ceil(horizon / life) - 1;
-  const genReplacements10 = calcReplacements(10, genericLife);
-  const etReplacements10 = calcReplacements(10, eternityLife);
-  const genTCO10 = (genericCapex * (1 + genReplacements10)) + (genericInstall * (1 + genReplacements10)) + (genericMaint * 10);
-  const etTCO10 = (eternityCapex * (1 + etReplacements10)) + (eternityInstall * (1 + etReplacements10)) + (eternityMaint * 10);
-  const savings10 = genTCO10 - etTCO10;
-  const etCostPerYear10 = etTCO10 / 10;
+  const checklistItems = [
+    { id: 1, category: 'A. RECEPCIÓN Y MONTAJE', text: 'Inspección visual: sin grietas, fugas ni deformación de carcasas', hasValue: false },
+    { id: 2, category: 'A. RECEPCIÓN Y MONTAJE', text: 'Polaridad verificada elemento a elemento antes de conectar', hasValue: false },
+    { id: 3, category: 'A. RECEPCIÓN Y MONTAJE', text: 'Conexiones limpias y con grasa neutra / protector aplicado', hasValue: false },
+    { id: 4, category: 'A. RECEPCIÓN Y MONTAJE', text: 'Torque de conexiones según fabricante', hasValue: true, valueLabel: 'N·m aplicado' },
+    { id: 5, category: 'A. RECEPCIÓN Y MONTAJE', text: 'Separación entre elementos ≥ 10 mm y bancada nivelada', hasValue: false },
+    { id: 6, category: 'A. RECEPCIÓN Y MONTAJE', text: 'Aislamiento del banco respecto a bancada verificado', hasValue: false },
+    
+    { id: 7, category: 'B. ENTORNO', text: 'Sala con ventilación conforme a EN IEC 62485-2', hasValue: false },
+    { id: 8, category: 'B. ENTORNO', text: 'Temperatura ambiente de la sala registrada', hasValue: true, valueLabel: '°C' },
+    { id: 9, category: 'B. ENTORNO', text: 'Sin fuentes de calor/chispa próximas; señalización instalada', hasValue: false },
+    { id: 10, category: 'B. ENTORNO', text: 'EPIs y medios de seguridad disponibles (lavaojos si OPzS)', hasValue: false },
+    
+    { id: 11, category: 'C. PUESTA EN MARCHA ELÉCTRICA', text: 'Tensión en circuito abierto (OCV) por elemento dentro de rango', hasValue: true, valueLabel: 'V mín registrado' },
+    { id: 12, category: 'C. PUESTA EN MARCHA ELÉCTRICA', text: 'Desviación máxima de OCV entre elementos ≤ 0,05 V (2 V)', hasValue: true, valueLabel: 'V máx registrado' },
+    { id: 13, category: 'C. PUESTA EN MARCHA ELÉCTRICA', text: 'Tensión total del banco medida y registrada', hasValue: true, valueLabel: 'V total' },
+    { id: 14, category: 'C. PUESTA EN MARCHA ELÉCTRICA', text: 'Setpoint de FLOTACIÓN del cargador ajustado (V/elem)', hasValue: true, valueLabel: 'V/elem' },
+    { id: 15, category: 'C. PUESTA EN MARCHA ELÉCTRICA', text: 'Setpoint de ABSORCIÓN/carga ajustado (V/elem)', hasValue: true, valueLabel: 'V/elem' },
+    { id: 16, category: 'C. PUESTA EN MARCHA ELÉCTRICA', text: 'Compensación térmica del cargador activada (mV/°C/elem)', hasValue: true, valueLabel: 'mV/°C' },
+    { id: 17, category: 'C. PUESTA EN MARCHA ELÉCTRICA', text: 'Limitación de corriente de carga configurada (% C10)', hasValue: true, valueLabel: '% C10' },
+    
+    { id: 18, category: 'D. VALIDACIÓN FINAL', text: 'Prueba de autonomía bajo carga real superada', hasValue: true, valueLabel: 'min ensayados' },
+    { id: 19, category: 'D. VALIDACIÓN FINAL', text: 'Registro fotográfico del banco e instalación realizado', hasValue: false },
+    { id: 20, category: 'D. VALIDACIÓN FINAL', text: 'Cliente informado del plan de mantenimiento y garantía', hasValue: false },
+  ];
 
-  // Calculate Payback (Months to recover investment based on avoided losses)
-  const paybackMonths = annualLoss > 0 ? (eternityCapex / annualLoss) * 12 : 0;
+  // State for checklist answers
+  const [checks, setChecks] = useState<Record<number, {status: 'OK' | 'NOK' | null, value: string, obs: string}>>({});
 
-  const chosenModelObj = modelos.find(m => m.modelo === selectedModelH4);
-  const capacityStr = chosenModelObj ? `${chosenModelObj.especificaciones?.capacidad_nominal_ah || '-'} Ah` : '-';
+  const toggleCheck = (id: number, status: 'OK' | 'NOK') => {
+    setChecks((prev: any) => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        status: prev[id]?.status === status ? null : status,
+        value: prev[id]?.value || '',
+        obs: prev[id]?.obs || ''
+      }
+    }));
+  };
+
+  const updateField = (id: number, field: 'value' | 'obs', val: string) => {
+    setChecks((prev: any) => ({
+      ...prev,
+      [id]: {
+        status: prev[id]?.status || null,
+        value: field === 'value' ? val : (prev[id]?.value || ''),
+        obs: field === 'obs' ? val : (prev[id]?.obs || '')
+      }
+    }));
+  };
+
+  const okCount = Object.values(checks).filter((c: any) => c.status === 'OK').length;
+  const isApto = okCount === 20;
+
+  // Group items by category for rendering
+  const groupedItems = checklistItems.reduce((acc, item) => {
+    if (!acc[item.category]) acc[item.category] = [];
+    acc[item.category].push(item);
+    return acc;
+  }, {} as Record<string, typeof checklistItems>);
 
   return (
-    <div className="p-8 max-w-4xl mx-auto pb-24">
-      <div className="flex justify-between items-start mb-8 border-b pb-4">
+    <div className="p-8 max-w-5xl mx-auto pb-24">
+      <div className="flex justify-between items-start mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-indigo-900 flex items-center gap-3">
-            <Presentation className="w-8 h-8 text-indigo-600" />
-            Propuesta de Solución de Continuidad
+          <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
+            <ClipboardCheck className="w-8 h-8 text-purple-600" />
+            H6 · Checklist de Instalación y Garantía
           </h1>
-          <p className="text-gray-500 mt-2">
-            Resumen ejecutivo para {clientName || 'Cliente'} — Confidencial
+          <p className="text-gray-600 mt-2 max-w-3xl">
+            Documento que activa la cobertura de fábrica. Completar en la puesta en marcha, firmar y adjuntar al expediente de garantía.
           </p>
         </div>
         <button
           onClick={handleExportPDF}
           disabled={isExporting}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md shadow-sm transition print:hidden"
+          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-4 py-2 rounded shadow-sm transition print:hidden"
         >
-          <Download className="w-4 h-4" />
-          <span>{isExporting ? 'Exportando...' : 'Exportar a PDF'}</span>
+          <Printer className="w-4 h-4" />
+          <span>{isExporting ? 'Exportando...' : 'Descargar PDF'}</span>
         </button>
       </div>
 
       <div ref={contentRef}>
 
-      <div className="space-y-8">
-        {/* 1. Cliente y Situación Actual */}
-        <section className="bg-white rounded-lg shadow-sm border p-6">
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4 border-b pb-2">
-            <Building className="w-5 h-5 text-gray-400" />
-            1. Situación Actual y Riesgo Operativo
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <p className="text-sm text-gray-500 font-medium">Cliente</p>
-              <p className="font-semibold text-gray-800">{clientName || '-'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 font-medium">Sector</p>
-              <p className="font-semibold text-gray-800">{sector || '-'}</p>
-            </div>
-            <div className="bg-red-50 p-3 rounded border border-red-100 col-span-2 md:col-span-1">
-              <p className="text-xs text-red-600 font-bold uppercase">Pérdida Anual Estimada</p>
-              <p className="text-xl font-black text-red-700">${annualLoss.toLocaleString()}</p>
-            </div>
-            <div className="bg-red-50 p-3 rounded border border-red-100 col-span-2 md:col-span-1">
-              <p className="text-xs text-red-600 font-bold uppercase">Riesgo Acumulado (5 Años)</p>
-              <p className="text-xl font-black text-red-700">${fiveYearLoss.toLocaleString()}</p>
-            </div>
-          </div>
-        </section>
-
-        {/* 2. Solución Propuesta */}
-        <section className="bg-white rounded-lg shadow-sm border p-6">
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4 border-b pb-2">
-            <Battery className="w-5 h-5 text-gray-400" />
-            2. Solución Tecnológica Eternity
-          </h2>
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <p className="text-sm text-gray-500 font-medium mb-1">Tecnología Seleccionada</p>
-              <p className="font-bold text-blue-900 text-lg">{recommendedFamily || '-'}</p>
-              <p className="text-xs text-gray-500 mt-1">Óptima para las condiciones térmicas y operativas de su planta.</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 font-medium mb-1">Modelo Dimensionado</p>
-              <p className="font-bold text-gray-800 text-lg">{selectedModelH4 || '-'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 font-medium mb-1">Sistema y Capacidad</p>
-              <p className="font-semibold text-gray-800">{systemVoltage} VDC — {capacityStr}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 font-medium mb-1">Autonomía de Diseño</p>
-              <p className="font-semibold text-gray-800">{autonomyReqH4} horas</p>
-            </div>
-          </div>
-        </section>
-
-        {/* 3. Justificación Económica */}
-        <section className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-sm border border-green-200 p-6">
-          <h2 className="text-xl font-bold text-green-900 flex items-center gap-2 mb-4 border-b border-green-200 pb-2">
-            <TrendingUp className="w-5 h-5 text-green-600" />
-            3. Justificación Económica (ROI)
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="bg-white p-4 rounded border border-green-100 shadow-sm text-center">
-              <p className="text-xs text-gray-500 font-bold uppercase mb-1">Inversión (CAPEX)</p>
-              <p className="text-2xl font-black text-gray-800">${eternityCapex.toLocaleString()}</p>
-            </div>
-            <div className="bg-white p-4 rounded border border-green-100 shadow-sm text-center">
-              <p className="text-xs text-gray-500 font-bold uppercase mb-1">Retorno de Inversión</p>
-              <p className="text-2xl font-black text-green-600">{paybackMonths.toFixed(1)} meses</p>
-              <p className="text-xs text-gray-400">(frente a pérdidas)</p>
-            </div>
-            <div className="bg-white p-4 rounded border border-green-100 shadow-sm text-center">
-              <p className="text-xs text-gray-500 font-bold uppercase mb-1">Ahorro vs Alternativa (10 años)</p>
-              <p className="text-2xl font-black text-blue-700">${savings10.toLocaleString()}</p>
-            </div>
-          </div>
-
-          <div className="bg-white bg-opacity-60 p-4 rounded text-green-900 italic text-sm">
-            <p>
-              <strong>Resumen Ejecutivo:</strong> La inversión de ${eternityCapex.toLocaleString()} en la tecnología {recommendedFamily} se amortiza en tan solo {paybackMonths.toFixed(1)} meses al evitar las paradas actuales. Además, gracias a su mayor vida útil, reduce su Coste Total de Propiedad en ${savings10.toLocaleString()} a lo largo de 10 años comparado con tecnologías estándar, con un coste anualizado de solo ${etCostPerYear10.toLocaleString()}/año.
-            </p>
-          </div>
-        </section>
-
-        {/* 4. Siguientes Pasos */}
-        <section className="bg-white rounded-lg shadow-sm border p-6">
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4 border-b pb-2">
-            <ArrowRight className="w-5 h-5 text-indigo-500" />
-            4. Siguiente Paso
-          </h2>
-          <div className="flex gap-4 items-center bg-indigo-50 p-4 rounded border border-indigo-100">
-            <input type="checkbox" className="w-5 h-5 text-indigo-600 rounded" />
-            <p className="text-indigo-900 font-medium">
-              Auditoría técnica gratuita en sitio para validar el cargador existente y condiciones finales de instalación. 
-              <br /><span className="text-sm font-normal">Fecha propuesta: ___/___/20__</span>
-            </p>
-          </div>
-        </section>
-
-        <div className="pt-8 flex justify-between items-end border-t border-gray-300">
+      <div className="bg-white rounded-lg shadow-md border mb-8">
+        <div className="bg-gray-50 px-6 py-4 border-b">
+          <h2 className="text-lg font-bold text-gray-800">Datos del Proyecto</h2>
+        </div>
+        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p className="text-xs text-gray-500">Documento generado el {new Date().toLocaleDateString()}</p>
-            <p className="text-xs text-gray-500">Validez de la propuesta: 30 días</p>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+            <input type="text" className="w-full p-2 border border-gray-300 rounded" value={clientName} readOnly />
           </div>
-          <div className="text-right">
-            <p className="text-sm font-bold text-gray-700">Eternity Technologies</p>
-            <p className="text-xs text-gray-500 mt-8 border-t border-gray-400 pt-1 inline-block w-48 text-center">Firma Asesor / Comercial</p>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Técnico instalador</label>
+            <input type="text" className="w-full p-2 border border-gray-300 rounded" value={checklistData.tecnico} onChange={e => handleDataChange('tecnico', e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación / planta</label>
+            <input type="text" className="w-full p-2 border border-gray-300 rounded" value={checklistData.ubicacion} onChange={e => handleDataChange('ubicacion', e.target.value)} />
+          </div>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Modelo</label>
+              <input type="text" className="w-full p-2 border border-gray-300 rounded bg-gray-50" value={selectedModelH4} readOnly />
+            </div>
+            <div className="w-1/3">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cant.</label>
+              <input type="text" className="w-full p-2 border border-gray-300 rounded" value={checklistData.cantidad} onChange={e => handleDataChange('cantidad', e.target.value)} />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha puesta en marcha</label>
+            <input type="date" className="w-full p-2 border border-gray-300 rounded" value={checklistData.fecha} onChange={e => handleDataChange('fecha', e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nº de serie / Lote</label>
+            <input type="text" className="w-full p-2 border border-gray-300 rounded" value={checklistData.serie} onChange={e => handleDataChange('serie', e.target.value)} />
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md border overflow-hidden">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-gray-100 text-gray-600 text-sm">
+              <th className="p-3 w-10 text-center">Nº</th>
+              <th className="p-3">Punto de verificación</th>
+              <th className="p-3 w-28 text-center">Estado</th>
+              <th className="p-3 w-40">Valor medido</th>
+              <th className="p-3 w-48">Observaciones</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {Object.entries(groupedItems).map(([category, items]) => (
+              <Fragment key={category}>
+                <tr className="bg-purple-50">
+                  <td colSpan={5} className="p-3 font-bold text-purple-900 text-sm">{category}</td>
+                </tr>
+                {items.map(item => (
+                  <tr key={item.id} className="hover:bg-gray-50">
+                    <td className="p-3 text-center text-gray-500 font-medium">{item.id}</td>
+                    <td className="p-3 text-sm text-gray-800">{item.text}</td>
+                    <td className="p-3 text-center">
+                      <div className="flex justify-center gap-1">
+                        <button 
+                          onClick={() => toggleCheck(item.id, 'OK')}
+                          className={`p-1.5 rounded-full border ${checks[item.id]?.status === 'OK' ? 'bg-green-100 border-green-500 text-green-600' : 'bg-white border-gray-300 text-gray-400 hover:bg-gray-100'}`}
+                          title="OK"
+                        >
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => toggleCheck(item.id, 'NOK')}
+                          className={`p-1.5 rounded-full border ${checks[item.id]?.status === 'NOK' ? 'bg-red-100 border-red-500 text-red-600' : 'bg-white border-gray-300 text-gray-400 hover:bg-gray-100'}`}
+                          title="No OK"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                    <td className="p-3">
+                      {item.hasValue && (
+                        <div className="flex items-center gap-1">
+                          <input 
+                            type="text" 
+                            className="w-full p-1.5 text-sm border border-gray-300 rounded" 
+                            placeholder={item.valueLabel}
+                            value={checks[item.id]?.value || ''}
+                            onChange={(e) => updateField(item.id, 'value', e.target.value)}
+                          />
+                        </div>
+                      )}
+                    </td>
+                    <td className="p-3">
+                      <input 
+                        type="text" 
+                        className="w-full p-1.5 text-sm border border-gray-300 rounded" 
+                        placeholder="..."
+                        value={checks[item.id]?.obs || ''}
+                        onChange={(e) => updateField(item.id, 'obs', e.target.value)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-8 flex flex-col md:flex-row gap-6">
+        <div className={`flex-1 rounded-lg border p-6 flex flex-col justify-center items-center text-center ${isApto ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+          <p className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-2">Resultado Final</p>
+          <div className="flex items-end gap-2 mb-2">
+            <span className={`text-4xl font-black ${isApto ? 'text-green-600' : 'text-gray-700'}`}>{okCount}</span>
+            <span className="text-xl text-gray-500 mb-1">/ 20</span>
+          </div>
+          <p className="text-gray-600 text-sm mb-4">Puntos OK aplicables</p>
+          
+          {isApto ? (
+            <div className="bg-green-600 text-white font-bold py-2 px-6 rounded-full inline-flex items-center gap-2">
+              <Check className="w-5 h-5" />
+              APTO PARA REGISTRO DE GARANTÍA
+            </div>
+          ) : (
+            <div className="bg-gray-300 text-gray-600 font-bold py-2 px-6 rounded-full">
+              NO APTO (Completar puntos)
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1 bg-white rounded-lg border p-6 flex flex-col justify-end">
+          <div className="grid grid-cols-2 gap-8 h-full">
+            <div className="border-b-2 border-gray-300 flex items-end pb-2">
+              <span className="text-sm text-gray-500 font-medium">Firma Técnico:</span>
+            </div>
+            <div className="border-b-2 border-gray-300 flex items-end pb-2">
+              <span className="text-sm text-gray-500 font-medium">Firma Cliente:</span>
+            </div>
           </div>
         </div>
       </div>
