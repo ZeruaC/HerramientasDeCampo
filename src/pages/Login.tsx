@@ -47,7 +47,7 @@ export function Login() {
       <div className="flex-1 flex items-center justify-center px-8">
         <div className="grid grid-cols-2 gap-16 w-full max-w-7xl items-center">
           {/* Left side - Professional image */}
-          <div className="hidden lg:block">
+          <div>
             <div
               className="rounded-xl overflow-hidden shadow-2xl h-[500px] bg-cover bg-center border-4 border-slate-500"
               style={{
