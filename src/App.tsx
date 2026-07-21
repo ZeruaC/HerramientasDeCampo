@@ -116,7 +116,7 @@ function App() {
           <div className="p-4 border-b border-slate-700">
             <Link to="/" className="flex items-center gap-2 text-lg font-bold text-white">
               <Layout className="w-6 h-6 text-green-400" />
-              <span>Eternity Tools</span>
+              <span>Herramientas de Campo</span>
             </Link>
           </div>
           <nav className="flex-1 overflow-y-auto p-3 space-y-1">
@@ -138,8 +138,8 @@ function App() {
           </div>
         </aside>
         <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 relative">
-          {/* Logo PELSA - Esquina superior izquierda */}
-          <div className="absolute top-4 left-4 h-10 z-20 pointer-events-none">
+          {/* Logo PELSA - Esquina superior izquierda (+12%) */}
+          <div className="absolute top-4 left-4 h-12 z-20 pointer-events-none">
             <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-full object-contain opacity-80" />
           </div>
 
@@ -149,8 +149,8 @@ function App() {
           </div>
 
           {/* Logo Balore - Esquina inferior derecha */}
-          <div className="absolute bottom-4 right-4 h-8 z-20 pointer-events-none">
-            <img src="/logos/balore-favicon.png" alt="Balore" className="h-full object-contain opacity-60" />
+          <div className="absolute bottom-4 right-4 h-12 z-20 pointer-events-none">
+            <img src="/logos/balore-logo.png" alt="Balore" className="h-full object-contain opacity-70" />
           </div>
 
           <Routes>
