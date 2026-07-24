@@ -1,0 +1,208 @@
+{
+  "compatibility_rules": {
+    "MOTIVE POWER": {
+      "Larga Duración": {
+        "nombre": "Larga Duración",
+        "usos_validos": ["Tracción / Carga Oportunidad"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": true,
+        "tipo_mantenimiento": "agua",
+        "espacio_minimo_mm": 300,
+        "autonomia_recomendada": "4-8h",
+        "nota": "Tecnología inundada, requiere personal técnico"
+      },
+      "Gel Semi-Tracción Bloc": {
+        "nombre": "Gel Semi-Tracción Bloc",
+        "usos_validos": ["Tracción / Carga Oportunidad"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": false,
+        "tipo_mantenimiento": "ninguno",
+        "espacio_minimo_mm": 300,
+        "autonomia_recomendada": "4-8h",
+        "nota": "Gel, ciclos moderados, sin mantenimiento"
+      },
+      "QUASAR Flooded Bloc": {
+        "nombre": "QUASAR Flooded Bloc",
+        "usos_validos": ["Tracción / Carga Oportunidad"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": true,
+        "tipo_mantenimiento": "agua",
+        "espacio_minimo_mm": 300,
+        "autonomia_recomendada": "4-12h",
+        "nota": "Nano-carbon technology, ciclos profundos, multiturnos"
+      }
+    },
+    "RESERVE POWER": {
+      "OPzV Solar": {
+        "nombre": "OPzV Solar",
+        "usos_validos": ["Ciclado Diario (Solar)", "Standby/Flotación (UPS)"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": false,
+        "tipo_mantenimiento": "ninguno",
+        "espacio_minimo_mm": 250,
+        "autonomia_recomendada": "2-8h",
+        "nota": "Tubular abierto, sin agua. Ideal solar off-grid"
+      },
+      "OPzS Solar": {
+        "nombre": "OPzS Solar",
+        "usos_validos": ["Ciclado Diario (Solar)"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": true,
+        "tipo_mantenimiento": "agua",
+        "espacio_minimo_mm": 300,
+        "autonomia_recomendada": "2-8h",
+        "nota": "Inundado, ciclos solares, requiere mantenimiento"
+      },
+      "OPzS Standby": {
+        "nombre": "OPzS Standby",
+        "usos_validos": ["Standby/Flotación (UPS)"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": true,
+        "tipo_mantenimiento": "agua",
+        "espacio_minimo_mm": 300,
+        "autonomia_recomendada": ">8h",
+        "nota": "Inundado standby, requiere mantenimiento"
+      },
+      "OPzV Standby": {
+        "nombre": "OPzV Standby",
+        "usos_validos": ["Standby/Flotación (UPS)"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": false,
+        "tipo_mantenimiento": "ninguno",
+        "espacio_minimo_mm": 250,
+        "autonomia_recomendada": ">8h",
+        "nota": "Tubular, flotación 20+ años. Data centers, subestaciones"
+      },
+      "Gel Solar Bloc": {
+        "nombre": "Gel Solar Bloc",
+        "usos_validos": ["Ciclado Diario (Solar)"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": false,
+        "tipo_mantenimiento": "ninguno",
+        "espacio_minimo_mm": 300,
+        "autonomia_recomendada": "2-8h",
+        "nota": "Gel, ciclos solares, sin mantenimiento"
+      },
+      "Gel Leisure Bloc": {
+        "nombre": "Gel Leisure Bloc",
+        "usos_validos": ["Standby/Flotación (UPS)"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": false,
+        "tipo_mantenimiento": "ninguno",
+        "espacio_minimo_mm": 250,
+        "autonomia_recomendada": ">8h",
+        "nota": "Gel standby, sin mantenimiento"
+      },
+      "OGi Bloc": {
+        "nombre": "OGi Bloc",
+        "usos_validos": ["Standby/Flotación (UPS)"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": false,
+        "tipo_mantenimiento": "ninguno",
+        "espacio_minimo_mm": 250,
+        "autonomia_recomendada": ">8h",
+        "nota": "OGi technology, flotación"
+      },
+      "QUASAR Estándar": {
+        "nombre": "QUASAR Estándar",
+        "usos_validos": ["Standby/Flotación (UPS)", "Tracción / Carga Oportunidad"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": false,
+        "tipo_mantenimiento": "ninguno",
+        "espacio_minimo_mm": 250,
+        "autonomia_recomendada": "2-12h",
+        "nota": "Nano-carbon, flotación + ciclos, versátil"
+      },
+      "QUASAR Gel Bloc": {
+        "nombre": "QUASAR Gel Bloc",
+        "usos_validos": ["Ciclado Diario (Solar)"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": false,
+        "tipo_mantenimiento": "ninguno",
+        "espacio_minimo_mm": 300,
+        "autonomia_recomendada": "2-8h",
+        "nota": "QUASAR gel, ciclos solares"
+      },
+      "QUASAR VRLA": {
+        "nombre": "QUASAR VRLA",
+        "usos_validos": ["Standby/Flotación (UPS)"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": false,
+        "tipo_mantenimiento": "ninguno",
+        "espacio_minimo_mm": 250,
+        "autonomia_recomendada": ">8h",
+        "nota": "QUASAR VRLA, flotación sin mantenimiento"
+      },
+      "Bajo Mantenimiento": {
+        "nombre": "Bajo Mantenimiento",
+        "usos_validos": ["Standby/Flotación (UPS)"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": false,
+        "tipo_mantenimiento": "mínimo",
+        "espacio_minimo_mm": 250,
+        "autonomia_recomendada": ">8h",
+        "nota": "Bajo mantenimiento, standby"
+      },
+      "PzV Bajo Mantenimiento": {
+        "nombre": "PzV Bajo Mantenimiento",
+        "usos_validos": ["Standby/Flotación (UPS)"],
+        "temp_min": -20,
+        "temp_max": 55,
+        "requiere_mantenimiento": false,
+        "tipo_mantenimiento": "mínimo",
+        "espacio_minimo_mm": 250,
+        "autonomia_recomendada": ">8h",
+        "nota": "PzV bajo mantenimiento, standby"
+      }
+    }
+  },
+  "condiciones_cliente_mapping": {
+    "temperatura": {
+      "<25°C": {
+        "penaliza": [],
+        "favorece": ["OPzV Solar", "OPzV Standby", "QUASAR Estándar", "Gel Solar Bloc", "Gel Leisure Bloc", "OGi Bloc", "QUASAR Gel Bloc", "QUASAR VRLA", "Bajo Mantenimiento", "PzV Bajo Mantenimiento"]
+      },
+      "25-35°C": {
+        "penaliza": [],
+        "favorece": ["OPzV Solar", "OPzV Standby", "OPzS Solar", "OPzS Standby", "QUASAR Estándar", "Gel Solar Bloc", "Gel Leisure Bloc", "OGi Bloc", "QUASAR Gel Bloc", "QUASAR VRLA", "Bajo Mantenimiento", "PzV Bajo Mantenimiento", "Larga Duración", "Gel Semi-Tracción Bloc", "QUASAR Flooded Bloc"]
+      },
+      ">35°C": {
+        "penaliza": [],
+        "favorece": ["OPzV Solar", "OPzV Standby", "QUASAR Estándar", "QUASAR VRLA", "Larga Duración", "QUASAR Flooded Bloc"]
+      }
+    },
+    "mantenimiento": {
+      "Sí": {
+        "permite": ["OPzV Solar", "OPzS Solar", "OPzS Standby", "OPzV Standby", "Gel Solar Bloc", "Gel Leisure Bloc", "OGi Bloc", "QUASAR Estándar", "QUASAR Gel Bloc", "QUASAR VRLA", "Bajo Mantenimiento", "PzV Bajo Mantenimiento", "Larga Duración", "Gel Semi-Tracción Bloc", "QUASAR Flooded Bloc"]
+      },
+      "No": {
+        "permite": ["OPzV Solar", "OPzV Standby", "Gel Solar Bloc", "Gel Leisure Bloc", "OGi Bloc", "QUASAR Estándar", "QUASAR Gel Bloc", "QUASAR VRLA", "Bajo Mantenimiento", "PzV Bajo Mantenimiento", "Gel Semi-Tracción Bloc"]
+      }
+    },
+    "operacion": {
+      "Standby/Flotación (UPS)": {
+        "permite": ["OPzV Standby", "OPzV Solar", "OPzS Standby", "QUASAR Estándar", "Gel Leisure Bloc", "OGi Bloc", "QUASAR VRLA", "Bajo Mantenimiento", "PzV Bajo Mantenimiento"]
+      },
+      "Ciclado Diario (Solar)": {
+        "permite": ["OPzV Solar", "OPzS Solar", "Gel Solar Bloc", "QUASAR Estándar", "QUASAR Gel Bloc", "Gel Semi-Tracción Bloc"]
+      },
+      "Tracción / Carga Oportunidad": {
+        "permite": ["Larga Duración", "QUASAR Flooded Bloc", "QUASAR Estándar", "Gel Semi-Tracción Bloc"]
+      }
+    }
+  }
+}

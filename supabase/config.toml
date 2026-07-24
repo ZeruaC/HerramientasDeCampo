@@ -1,0 +1,7 @@
+# Supabase configuration
+[api]
+enabled = true
+max_rows = 1000
+
+[db]
+major_version = 15
