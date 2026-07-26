@@ -12,6 +12,7 @@ import { Login } from './pages/Login';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { ProposalSearch } from './components/ProposalSearch';
 
 // Placeholder components for pages
 const Home = () => (
@@ -151,6 +152,7 @@ function AppContent() {
           <SidebarLink to="/h5" icon={FileCheck}>H5 · Propuesta</SidebarLink>
           <SidebarLink to="/h6" icon={Presentation}>H6 · Checklist</SidebarLink>
         </nav>
+        <ProposalSearch />
         {/* User info and logout */}
         <div className="p-3 border-t border-slate-700 space-y-3">
           <div className="text-xs text-slate-400 truncate">{user.email}</div>

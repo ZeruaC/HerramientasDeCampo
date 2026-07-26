@@ -18,17 +18,30 @@ export const H5 = () => {
   const [signedAt, setSignedAt] = useState<string | null>(null);
 
   const { user } = useAuth();
-  const { saveProposal, updateProposalByNumber } = useProposals();
+  const { saveProposal, updateProposalByNumber, getProposalByNumber } = useProposals();
 
   const {
+    currentProposalNumber, setCurrentProposalNumber,
     clientName, sector,
     outagesPerYear, durationHours, costPerHour,
-    recommendedFamily,
+    recommendedFamily, selectedFamilyH4,
     eternityCapex, genericCapex, genericLife, genericMaint, genericInstall, eternityLife, eternityMaint, eternityInstall,
-    systemVoltage, selectedModelH4, autonomyReqH4
+    systemVoltage, selectedModelH4, autonomyReqH4,
+    loadPowerW, minTempH4, maxDod, inverterEfficiency
   } = useStore();
 
   const { modelos, loading } = useCatalog();
+
+  // Si venimos de "abrir" una propuesta guardada (buscador en el sidebar),
+  // recupera su número y estado de firma para no perderlos al re-guardar.
+  useEffect(() => {
+    if (!currentProposalNumber) return;
+    setProposalNumber(currentProposalNumber);
+    getProposalByNumber(currentProposalNumber).then((p) => {
+      if (p?.signed_at) setSignedAt(p.signed_at);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentProposalNumber]);
 
   // Calculate H1 losses
   const annualLoss = outagesPerYear * durationHours * costPerHour;
@@ -49,20 +62,39 @@ export const H5 = () => {
 
     try {
       const proposalData: any = {
+        sector: sector || undefined,
         annual_loss: annualLoss,
+        outages_per_year: outagesPerYear,
+        duration_hours: durationHours,
+        cost_per_hour: costPerHour,
+        recommended_family: recommendedFamily || undefined,
+        selected_family_h4: selectedFamilyH4 || undefined,
+        eternity_capex: eternityCapex || undefined,
+        system_voltage: systemVoltage || undefined,
+        selected_model: selectedModelH4 || undefined,
+        autonomy_hours: autonomyReqH4 || undefined,
+        generic_capex: genericCapex || undefined,
+        generic_life: genericLife || undefined,
+        generic_maint: genericMaint || undefined,
+        generic_install: genericInstall || undefined,
+        eternity_life: eternityLife || undefined,
+        eternity_maint: eternityMaint || undefined,
+        eternity_install: eternityInstall || undefined,
+        load_power_w: loadPowerW || undefined,
+        min_temp_h4: minTempH4 || undefined,
+        max_dod: maxDod || undefined,
+        inverter_efficiency: inverterEfficiency || undefined,
       };
 
-      if (sector) proposalData.sector = sector;
-      if (recommendedFamily) proposalData.recommended_family = recommendedFamily;
-      if (eternityCapex > 0) proposalData.eternity_capex = eternityCapex;
-      if (systemVoltage > 0) proposalData.system_voltage = systemVoltage;
-      if (selectedModelH4) proposalData.selected_model = selectedModelH4;
-      if (autonomyReqH4 > 0) proposalData.autonomy_hours = autonomyReqH4;
-
-      const propNum = await saveProposal(clientName, proposalData);
-
-      setProposalNumber(propNum);
-      setSaveMessage(`✅ Propuesta guardada: ${propNum}`);
+      if (proposalNumber) {
+        await updateProposalByNumber(proposalNumber, proposalData);
+        setSaveMessage(`✅ Propuesta actualizada: ${proposalNumber}`);
+      } else {
+        const propNum = await saveProposal(clientName, proposalData);
+        setProposalNumber(propNum);
+        setCurrentProposalNumber(propNum);
+        setSaveMessage(`✅ Propuesta guardada: ${propNum}`);
+      }
     } catch (err: any) {
       setSaveMessage(`❌ Error: ${err.message}`);
     } finally {

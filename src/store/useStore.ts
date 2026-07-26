@@ -21,6 +21,10 @@ export interface AuditData {
 }
 
 interface StoreState {
+  // Propuesta actualmente cargada (vacío = propuesta nueva sin guardar)
+  currentProposalNumber: string;
+  setCurrentProposalNumber: (num: string) => void;
+
   // Checklist data
   clientName: string;
   setClientName: (name: string) => void;
@@ -108,6 +112,9 @@ interface StoreState {
 }
 
 export const useStore = create<StoreState>((set) => ({
+  currentProposalNumber: '',
+  setCurrentProposalNumber: (num) => set({ currentProposalNumber: num }),
+
   // Checklist
   clientName: '',
   setClientName: (name) => set({ clientName: name }),

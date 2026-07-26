@@ -7,15 +7,27 @@ export interface Proposal {
   proposal_number: string;
   client_name: string;
   sector?: string;
-  outage_hours_per_week?: number;
-  affected_lines?: number;
+  outages_per_year?: number;
+  duration_hours?: number;
   cost_per_hour?: number;
   annual_loss?: number;
   recommended_family?: string;
+  selected_family_h4?: string;
   eternity_capex?: number;
   system_voltage?: number;
   selected_model?: string;
   autonomy_hours?: number;
+  generic_capex?: number;
+  generic_life?: number;
+  generic_maint?: number;
+  generic_install?: number;
+  eternity_life?: number;
+  eternity_maint?: number;
+  eternity_install?: number;
+  load_power_w?: number;
+  min_temp_h4?: number;
+  max_dod?: number;
+  inverter_efficiency?: number;
   status: string;
   created_at: string;
   signed_at?: string;
@@ -81,6 +93,28 @@ export function useProposals() {
     }
   };
 
+  const getProposalByNumber = async (proposalNumber: string) => {
+    if (!user) return null;
+
+    setLoading(true);
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('proposals')
+        .select('*')
+        .eq('proposal_number', proposalNumber)
+        .eq('user_id', user.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+      return data as Proposal;
+    } catch (err: any) {
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const updateProposal = async (proposalId: string, updates: Partial<Proposal>) => {
     if (!user) throw new Error('No authenticated user');
 
@@ -121,5 +155,5 @@ export function useProposals() {
     }
   };
 
-  return { saveProposal, getProposals, updateProposal, updateProposalByNumber, loading, error };
+  return { saveProposal, getProposals, getProposalByNumber, updateProposal, updateProposalByNumber, loading, error };
 }
