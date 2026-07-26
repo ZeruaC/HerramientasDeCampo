@@ -1,54 +1,51 @@
-import { useState, useMemo, useEffect, Fragment } from 'react';
+import { useState } from 'react';
 
 import { useStore } from '../store/useStore';
-import { Calculator, TrendingDown, DollarSign } from 'lucide-react';
+import { Calculator, TrendingDown, DollarSign, AlertCircle } from 'lucide-react';
 
 export const H3 = () => {
+  const [isCalculated, setIsCalculated] = useState(false);
+
   const {
     genericCapex, setGenericCapex,
     genericLife, setGenericLife,
     genericMaint, setGenericMaint,
     genericInstall, setGenericInstall,
-    
+
     eternityCapex, setEternityCapex,
     eternityLife, setEternityLife,
     eternityMaint, setEternityMaint,
     eternityInstall, setEternityInstall
   } = useStore();
 
-  // Helper to calculate total replacements in a given horizon
+  // El horizonte de comparación se ajusta a los años que garantizamos en la
+  // vida útil de los vasos Eternity (eternityLife), en vez de un número fijo.
+  const horizonYears = eternityLife > 0 ? eternityLife : 0;
+
+  // Helper to calculate total replacements over the comparison horizon
   const calcReplacements = (horizon: number, life: number) => {
-    // If life is 3 years, over 10 years you buy at year 0, year 3, year 6, year 9 (4 purchases = 3 replacements)
+    if (!life || life <= 0) return 0;
     return Math.ceil(horizon / life) - 1;
   };
 
-  // 10 Years Horizon
-  const genReplacements10 = calcReplacements(10, genericLife);
-  const etReplacements10 = calcReplacements(10, eternityLife);
+  const genReplacements = calcReplacements(horizonYears, genericLife);
+  const etReplacements = calcReplacements(horizonYears, eternityLife);
 
-  const genCapex10 = genericCapex * (1 + genReplacements10);
-  const etCapex10 = eternityCapex * (1 + etReplacements10);
+  const genCapex = genericCapex * (1 + genReplacements);
+  const etCapex = eternityCapex * (1 + etReplacements);
 
-  const genInst10 = genericInstall * (1 + genReplacements10);
-  const etInst10 = eternityInstall * (1 + etReplacements10);
+  const genInst = genericInstall * (1 + genReplacements);
+  const etInst = eternityInstall * (1 + etReplacements);
 
-  const genMaint10 = genericMaint * 10;
-  const etMaint10 = eternityMaint * 10;
+  const genMaint = genericMaint * horizonYears;
+  const etMaint = eternityMaint * horizonYears;
 
-  const genTCO10 = genCapex10 + genInst10 + genMaint10;
-  const etTCO10 = etCapex10 + etInst10 + etMaint10;
+  const genTCO = genCapex + genInst + genMaint;
+  const etTCO = etCapex + etInst + etMaint;
 
-  // 5 Years Horizon
-  const genReplacements5 = calcReplacements(5, genericLife);
-  const etReplacements5 = calcReplacements(5, eternityLife);
-
-  const genTCO5 = (genericCapex * (1 + genReplacements5)) + (genericInstall * (1 + genReplacements5)) + (genericMaint * 5);
-  const etTCO5 = (eternityCapex * (1 + etReplacements5)) + (eternityInstall * (1 + etReplacements5)) + (eternityMaint * 5);
-
-  // Comparisons
-  const savings10 = genTCO10 - etTCO10;
-  const savingsPct10 = (savings10 / genTCO10) * 100;
-  const etCostPerYear10 = etTCO10 / 10;
+  const savings = genTCO - etTCO;
+  const savingsPct = genTCO > 0 ? (savings / genTCO) * 100 : 0;
+  const etCostPerYear = horizonYears > 0 ? etTCO / horizonYears : 0;
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -157,7 +154,9 @@ export const H3 = () => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Vida útil estimada (años)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Vida útil garantizada de los vasos (años)
+              </label>
               <input
                 type="number"
                 step="0.5"
@@ -165,6 +164,7 @@ export const H3 = () => {
                 value={eternityLife || ''}
                 onChange={(e) => setEternityLife(Number(e.target.value))}
               />
+              <p className="text-xs text-gray-500 mt-1">Este valor define el horizonte de la comparación TCO.</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Mantenimiento anual (USD)</label>
@@ -201,96 +201,108 @@ export const H3 = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-        <div className="bg-gray-50 px-6 py-4 border-b flex items-center gap-2">
-          <Calculator className="w-5 h-5 text-gray-600" />
-          <h2 className="text-lg font-bold text-gray-800">Cálculo — Horizonte de 10 Años</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-100 text-gray-600 text-sm uppercase tracking-wider">
-                <th className="p-4 font-medium">Concepto</th>
-                <th className="p-4 font-medium text-right">Alternativa</th>
-                <th className="p-4 font-medium text-right">Eternity</th>
-                <th className="p-4 font-medium text-right text-green-600">Ventaja Eternity</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              <tr>
-                <td className="p-4 text-gray-800">Compras del equipo (uds.)</td>
-                <td className="p-4 text-right">{1 + genReplacements10}</td>
-                <td className="p-4 text-right font-semibold text-blue-700">{1 + etReplacements10}</td>
-                <td className="p-4 text-right text-green-600">{(1 + genReplacements10) - (1 + etReplacements10)} menos</td>
-              </tr>
-              <tr>
-                <td className="p-4 text-gray-800">CAPEX total acumulado</td>
-                <td className="p-4 text-right">${genCapex10.toLocaleString()}</td>
-                <td className="p-4 text-right">${etCapex10.toLocaleString()}</td>
-                <td className="p-4 text-right text-green-600">${(genCapex10 - etCapex10).toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td className="p-4 text-gray-800">Instalaciones acumuladas</td>
-                <td className="p-4 text-right">${genInst10.toLocaleString()}</td>
-                <td className="p-4 text-right">${etInst10.toLocaleString()}</td>
-                <td className="p-4 text-right text-green-600">${(genInst10 - etInst10).toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td className="p-4 text-gray-800">Mantenimiento acumulado</td>
-                <td className="p-4 text-right">${genMaint10.toLocaleString()}</td>
-                <td className="p-4 text-right">${etMaint10.toLocaleString()}</td>
-                <td className="p-4 text-right text-green-600">${(genMaint10 - etMaint10).toLocaleString()}</td>
-              </tr>
-              <tr className="bg-gray-50 font-medium">
-                <td className="p-4 text-gray-800">TCO a 5 años</td>
-                <td className="p-4 text-right">${genTCO5.toLocaleString()}</td>
-                <td className="p-4 text-right">${etTCO5.toLocaleString()}</td>
-                <td className="p-4 text-right text-green-600">${(genTCO5 - etTCO5).toLocaleString()}</td>
-              </tr>
-              <tr className="bg-blue-50 font-bold text-lg">
-                <td className="p-4 text-blue-900">TCO A 10 AÑOS</td>
-                <td className="p-4 text-right">${genTCO10.toLocaleString()}</td>
-                <td className="p-4 text-right text-blue-700">${etTCO10.toLocaleString()}</td>
-                <td className="p-4 text-right text-green-600">${savings10.toLocaleString()}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="bg-green-50 border border-green-200 rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold text-green-800 mb-6 flex items-center gap-2">
-          <TrendingDown className="w-6 h-6" />
-          Resultado para el Cliente
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-green-100 text-center">
-            <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Ahorro Total (10 años)</p>
-            <p className="text-3xl font-black text-green-600">${savings10.toLocaleString()}</p>
-          </div>
-          
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-green-100 text-center">
-            <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Ahorro Relativo</p>
-            <p className="text-3xl font-bold text-green-600">{savingsPct10.toFixed(1)}%</p>
-          </div>
-          
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-blue-100 text-center">
-            <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Coste por año de vida</p>
-            <p className="text-3xl font-bold text-blue-700">${etCostPerYear10.toLocaleString()}</p>
-          </div>
-        </div>
-        
-        <div className="mt-6 p-4 bg-green-100 rounded-md">
-          <p className="font-semibold text-green-900 mb-1">Frase de cierre:</p>
-          <p className="text-green-800 italic">
-            "Aunque la inversión inicial parezca mayor, en la realidad técnica de su planta, la solución Eternity le ahorrará <strong>${savings10.toLocaleString()}</strong> a lo largo de 10 años, reduciendo su coste total de propiedad en un <strong>{savingsPct10.toFixed(0)}%</strong>."
+      {!isCalculated ? (
+        <button
+          onClick={() => setIsCalculated(true)}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors"
+        >
+          Calcular TCO
+        </button>
+      ) : horizonYears === 0 ? (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3 text-yellow-800">
+          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <p className="text-sm">
+            Indica la <strong>vida útil garantizada de los vasos Eternity</strong> para poder calcular el TCO: ese dato define el horizonte de la comparación.
           </p>
         </div>
-        <p className="text-xs text-green-700 mt-4 opacity-80">
-          Nota: El TCO no incluye coste de paradas no planificadas por fallo prematuro (usar H1 para ese argumento) ni coste financiero. Ambos juegan a favor de la opción de mayor vida útil.
-        </p>
-      </div>
+      ) : (
+        <>
+          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+            <div className="bg-gray-50 px-6 py-4 border-b flex items-center gap-2">
+              <Calculator className="w-5 h-5 text-gray-600" />
+              <h2 className="text-lg font-bold text-gray-800">Cálculo — Horizonte de {horizonYears} Años (garantía Eternity)</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-100 text-gray-600 text-sm uppercase tracking-wider">
+                    <th className="p-4 font-medium">Concepto</th>
+                    <th className="p-4 font-medium text-right">Alternativa</th>
+                    <th className="p-4 font-medium text-right">Eternity</th>
+                    <th className="p-4 font-medium text-right text-green-600">Ventaja Eternity</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  <tr>
+                    <td className="p-4 text-gray-800">Compras del equipo (uds.)</td>
+                    <td className="p-4 text-right">{1 + genReplacements}</td>
+                    <td className="p-4 text-right font-semibold text-blue-700">{1 + etReplacements}</td>
+                    <td className="p-4 text-right text-green-600">{(1 + genReplacements) - (1 + etReplacements)} menos</td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-gray-800">CAPEX total acumulado</td>
+                    <td className="p-4 text-right">${genCapex.toLocaleString()}</td>
+                    <td className="p-4 text-right">${etCapex.toLocaleString()}</td>
+                    <td className="p-4 text-right text-green-600">${(genCapex - etCapex).toLocaleString()}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-gray-800">Instalaciones acumuladas</td>
+                    <td className="p-4 text-right">${genInst.toLocaleString()}</td>
+                    <td className="p-4 text-right">${etInst.toLocaleString()}</td>
+                    <td className="p-4 text-right text-green-600">${(genInst - etInst).toLocaleString()}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-gray-800">Mantenimiento acumulado</td>
+                    <td className="p-4 text-right">${genMaint.toLocaleString()}</td>
+                    <td className="p-4 text-right">${etMaint.toLocaleString()}</td>
+                    <td className="p-4 text-right text-green-600">${(genMaint - etMaint).toLocaleString()}</td>
+                  </tr>
+                  <tr className="bg-blue-50 font-bold text-lg">
+                    <td className="p-4 text-blue-900">TCO A {horizonYears} AÑOS</td>
+                    <td className="p-4 text-right">${genTCO.toLocaleString()}</td>
+                    <td className="p-4 text-right text-blue-700">${etTCO.toLocaleString()}</td>
+                    <td className="p-4 text-right text-green-600">${savings.toLocaleString()}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold text-green-800 mb-6 flex items-center gap-2">
+              <TrendingDown className="w-6 h-6" />
+              Resultado para el Cliente
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-green-100 text-center">
+                <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Ahorro Total ({horizonYears} años)</p>
+                <p className="text-3xl font-black text-green-600">${savings.toLocaleString()}</p>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-green-100 text-center">
+                <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Ahorro Relativo</p>
+                <p className="text-3xl font-bold text-green-600">{savingsPct.toFixed(1)}%</p>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-blue-100 text-center">
+                <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Coste por año de vida</p>
+                <p className="text-3xl font-bold text-blue-700">${etCostPerYear.toLocaleString()}</p>
+              </div>
+            </div>
+
+            <div className="mt-6 p-4 bg-green-100 rounded-md">
+              <p className="font-semibold text-green-900 mb-1">Frase de cierre:</p>
+              <p className="text-green-800 italic">
+                "Aunque la inversión inicial parezca mayor, en la realidad técnica de su planta, la solución Eternity le ahorrará <strong>${savings.toLocaleString()}</strong> a lo largo de {horizonYears} años (la vida útil garantizada), reduciendo su coste total de propiedad en un <strong>{savingsPct.toFixed(0)}%</strong>."
+              </p>
+            </div>
+            <p className="text-xs text-green-700 mt-4 opacity-80">
+              Nota: El TCO no incluye coste de paradas no planificadas por fallo prematuro (usar H1 para ese argumento) ni coste financiero. Ambos juegan a favor de la opción de mayor vida útil.
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 };

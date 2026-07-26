@@ -83,14 +83,16 @@ export const H5 = () => {
     html2pdf().set(options).from(element).save().finally(() => setIsExporting(false));
   };
 
-  // Re-calculate H3 (10 years)
-  const calcReplacements = (horizon: number, life: number) => Math.ceil(horizon / life) - 1;
-  const genReplacements10 = calcReplacements(10, genericLife);
-  const etReplacements10 = calcReplacements(10, eternityLife);
-  const genTCO10 = (genericCapex * (1 + genReplacements10)) + (genericInstall * (1 + genReplacements10)) + (genericMaint * 10);
-  const etTCO10 = (eternityCapex * (1 + etReplacements10)) + (eternityInstall * (1 + etReplacements10)) + (eternityMaint * 10);
+  // Re-calculate H3 TCO using the same horizon as H3: the guaranteed life of
+  // the Eternity vasos (eternityLife), not a fixed number of years.
+  const horizonYears = eternityLife > 0 ? eternityLife : 0;
+  const calcReplacements = (horizon: number, life: number) => (!life || life <= 0 ? 0 : Math.ceil(horizon / life) - 1);
+  const genReplacements10 = calcReplacements(horizonYears, genericLife);
+  const etReplacements10 = calcReplacements(horizonYears, eternityLife);
+  const genTCO10 = (genericCapex * (1 + genReplacements10)) + (genericInstall * (1 + genReplacements10)) + (genericMaint * horizonYears);
+  const etTCO10 = (eternityCapex * (1 + etReplacements10)) + (eternityInstall * (1 + etReplacements10)) + (eternityMaint * horizonYears);
   const savings10 = genTCO10 - etTCO10;
-  const etCostPerYear10 = etTCO10 / 10;
+  const etCostPerYear10 = horizonYears > 0 ? etTCO10 / horizonYears : 0;
 
   // Calculate Payback (Months to recover investment based on avoided losses)
   const paybackMonths = annualLoss > 0 ? (eternityCapex / annualLoss) * 12 : 0;
@@ -212,14 +214,14 @@ export const H5 = () => {
               <p className="text-xs text-gray-400">(frente a pérdidas)</p>
             </div>
             <div className="bg-white p-4 rounded border border-green-100 shadow-sm text-center">
-              <p className="text-xs text-gray-500 font-bold uppercase mb-1">Ahorro vs Alternativa (10 años)</p>
+              <p className="text-xs text-gray-500 font-bold uppercase mb-1">Ahorro vs Alternativa ({horizonYears || '-'} años)</p>
               <p className="text-2xl font-black text-blue-700">${savings10.toLocaleString()}</p>
             </div>
           </div>
 
           <div className="bg-white bg-opacity-60 p-4 rounded text-green-900 italic text-sm">
             <p>
-              <strong>Resumen Ejecutivo:</strong> La inversión de ${eternityCapex.toLocaleString()} en la tecnología {recommendedFamily} se amortiza en tan solo {paybackMonths.toFixed(1)} meses al evitar las paradas actuales. Además, gracias a su mayor vida útil, reduce su Coste Total de Propiedad en ${savings10.toLocaleString()} a lo largo de 10 años comparado con tecnologías estándar, con un coste anualizado de solo ${etCostPerYear10.toLocaleString()}/año.
+              <strong>Resumen Ejecutivo:</strong> La inversión de ${eternityCapex.toLocaleString()} en la tecnología {recommendedFamily} se amortiza en tan solo {paybackMonths.toFixed(1)} meses al evitar las paradas actuales. Además, gracias a su mayor vida útil, reduce su Coste Total de Propiedad en ${savings10.toLocaleString()} a lo largo de {horizonYears} años (vida útil garantizada) comparado con tecnologías estándar, con un coste anualizado de solo ${etCostPerYear10.toLocaleString()}/año.
             </p>
           </div>
         </section>
