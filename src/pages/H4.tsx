@@ -20,16 +20,20 @@ export const H4 = () => {
 
   // Convert modelo objects to format compatible with calculation logic
   const catalogoArray = useMemo(() => {
-    return modelos.map(m => ({
-      modelo: m.modelo,
-      familia: m.familia,
-      subfamilia: m.subfamilia,
-      v: m.especificaciones?.voltaje_v || 2, // Default 2V
-      ah: m.especificaciones?.capacidad_nominal_ah || 0,
-      especificaciones: JSON.stringify(m.especificaciones || {}),
-      link: '',
-      notas: m.estado || ''
-    }));
+    return modelos
+      .map(m => ({
+        modelo: m.modelo,
+        familia: m.familia,
+        subfamilia: m.subfamilia,
+        v: m.especificaciones?.voltaje_v || 2, // Default 2V
+        ah: m.especificaciones?.capacidad_nominal_ah || 0,
+        especificaciones: JSON.stringify(m.especificaciones || {}),
+        link: '',
+        notas: m.estado || ''
+      }))
+      // Modelos sin capacidad conocida no se pueden dimensionar: se excluyen
+      // para evitar Infinity/NaN en ramas en paralelo y capacidad instalada.
+      .filter(m => m.ah > 0);
   }, [modelos]);
 
   // Calculation Logic
