@@ -11,6 +11,11 @@ export interface Proposal {
   phone_number?: string;
   location?: string;
   audit_data?: Record<string, any>;
+  max_temp?: string;
+  autonomy_req_h2?: string;
+  maintenance_available?: string;
+  operation_type?: string;
+  available_space?: string;
   outages_per_year?: number;
   duration_hours?: number;
   cost_per_hour?: number;

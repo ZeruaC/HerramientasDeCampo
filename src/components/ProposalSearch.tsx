@@ -34,6 +34,11 @@ export const ProposalSearch = () => {
     store.setPhoneNumber(p.phone_number || '');
     store.setLocation(p.location || '');
     useStore.setState({ audit: p.audit_data || {} });
+    store.setMaxTemp(p.max_temp || '25-35°C');
+    store.setAutonomyReqH2(p.autonomy_req_h2 || '>8 h');
+    store.setMaintenanceAvailable(p.maintenance_available || 'No');
+    store.setOperationType(p.operation_type || 'Standby/Flotación (UPS)');
+    store.setAvailableSpace(p.available_space || 'Reducido o sin ventilación');
     store.setOutagesPerYear(p.outages_per_year || 0);
     store.setDurationHours(p.duration_hours || 0);
     store.setCostPerHour(p.cost_per_hour || 0);
