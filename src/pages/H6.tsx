@@ -23,6 +23,7 @@ export const H6 = () => {
     serie: ''
   });
   const [checks, setChecks] = useState<Record<number, { status: 'OK' | 'NOK' | null, value: string, obs: string }>>({});
+  const [acceptedAt, setAcceptedAt] = useState<string | null>(null);
 
   // Recupera el checklist ya guardado de esa propuesta, para no perderlo al
   // re-guardar. Se dispara al abrir desde el buscador (prefilla el número) y
@@ -35,6 +36,7 @@ export const H6 = () => {
       if (data.metadata) setChecklistData((prev) => ({ ...prev, ...data.metadata }));
       if (data.checks) setChecks(data.checks);
     }
+    setAcceptedAt(p?.accepted_at || null);
   };
 
   useEffect(() => {
@@ -52,10 +54,16 @@ export const H6 = () => {
     setSaveMessage('');
 
     try {
+      // accepted_at registra la fecha y hora exactas en que el checklist llegó
+      // a 20/20 por primera vez (el cierre real de la venta/instalación). Si
+      // ya estaba fijada, no se vuelve a mover al re-guardar el mismo checklist.
+      const newAcceptedAt = isApto ? (acceptedAt || new Date().toISOString()) : acceptedAt;
       await updateProposalByNumber(proposalNumber, {
         status: isApto ? 'accepted' : 'draft',
         checklist_data: { metadata: checklistData, checks },
+        accepted_at: newAcceptedAt as unknown as string,
       });
+      setAcceptedAt(newAcceptedAt);
       setSaveMessage(`✅ Checklist guardado - Estado: ${isApto ? 'APTO' : 'PENDIENTE'}`);
     } catch (err: any) {
       setSaveMessage(`❌ Error: ${err.message}`);
@@ -308,10 +316,17 @@ export const H6 = () => {
           <p className="text-gray-600 text-sm mb-4">Puntos OK aplicables</p>
           
           {isApto ? (
-            <div className="bg-green-600 text-white font-bold py-2 px-6 rounded-full inline-flex items-center gap-2">
-              <Check className="w-5 h-5" />
-              APTO PARA REGISTRO DE GARANTÍA
-            </div>
+            <>
+              <div className="bg-green-600 text-white font-bold py-2 px-6 rounded-full inline-flex items-center gap-2">
+                <Check className="w-5 h-5" />
+                APTO PARA REGISTRO DE GARANTÍA
+              </div>
+              {acceptedAt && (
+                <p className="text-xs text-gray-500 mt-3">
+                  Aceptado el {new Date(acceptedAt).toLocaleDateString()} a las {new Date(acceptedAt).toLocaleTimeString()}
+                </p>
+              )}
+            </>
           ) : (
             <div className="bg-gray-300 text-gray-600 font-bold py-2 px-6 rounded-full">
               NO APTO (Completar puntos)

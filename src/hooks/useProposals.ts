@@ -43,6 +43,7 @@ export interface Proposal {
   created_at: string;
   signed_at?: string;
   checklist_data?: Record<string, any>;
+  accepted_at?: string;
 }
 
 export function useProposals() {
