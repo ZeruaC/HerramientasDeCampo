@@ -1,11 +1,43 @@
 import { create } from 'zustand';
 
+export interface AuditData {
+  marca?: string;
+  modelo?: string;
+  tecnologia?: string;
+  voltajeSistema?: number;
+  capacidadAh?: number;
+  cRate?: string;
+  numeroElementos?: number;
+  anosServicio?: number;
+  uso?: string;
+  mantenimientoDisponible?: string;
+  espacioDisponible?: string;
+  cortesFrecuentes?: boolean;
+  finDeVida?: boolean;
+  mantenimientoCostoso?: boolean;
+  faltaVentilacion?: boolean;
+  espacioInsuficiente?: boolean;
+  otrosProblemas?: string;
+}
+
 interface StoreState {
-  // H1 Data
+  // Checklist data
   clientName: string;
   setClientName: (name: string) => void;
   sector: string;
   setSector: (sector: string) => void;
+  contactPerson: string;
+  setContactPerson: (person: string) => void;
+  phoneNumber: string;
+  setPhoneNumber: (phone: string) => void;
+  location: string;
+  setLocation: (location: string) => void;
+
+  // Audit data
+  audit: AuditData;
+  setAudit: (audit: Partial<AuditData>) => void;
+
+  // H1 Data (Dolor del Cliente)
   outageHoursPerWeek: number;
   setOutageHoursPerWeek: (hours: number) => void;
   affectedLines: number;
@@ -71,11 +103,23 @@ interface StoreState {
 }
 
 export const useStore = create<StoreState>((set) => ({
-  // H1
+  // Checklist
   clientName: '',
   setClientName: (name) => set({ clientName: name }),
   sector: '',
   setSector: (sector) => set({ sector }),
+  contactPerson: '',
+  setContactPerson: (person) => set({ contactPerson: person }),
+  phoneNumber: '',
+  setPhoneNumber: (phone) => set({ phoneNumber: phone }),
+  location: '',
+  setLocation: (location) => set({ location }),
+
+  // Audit
+  audit: {},
+  setAudit: (audit) => set((state) => ({ audit: { ...state.audit, ...audit } })),
+
+  // H1
   outageHoursPerWeek: 0,
   setOutageHoursPerWeek: (hours) => set({ outageHoursPerWeek: hours }),
   affectedLines: 0,

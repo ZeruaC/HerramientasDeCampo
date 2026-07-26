@@ -1,10 +1,12 @@
-import { useState, useMemo, useEffect, Fragment } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 import { useStore } from '../store/useStore';
 import { useCatalog } from '../hooks/useCatalog';
-import { ThermometerSun, Clock, Wrench, Battery, ShieldAlert, CheckCircle } from 'lucide-react';
+import { ThermometerSun, Clock, Wrench, Battery, CheckCircle } from 'lucide-react';
 
 export const H2 = () => {
+  const [isCompleted, setIsCompleted] = useState(false);
+
   const {
     maxTemp, setMaxTemp,
     autonomyReqH2, setAutonomyReqH2,
@@ -17,7 +19,6 @@ export const H2 = () => {
 
   const { familias, loading, error } = useCatalog();
 
-  // Scoring logic - Recommends subfamilies based on client conditions
   const evaluation = useMemo(() => {
     let scores = {
       'OPzV Standby': 0,
@@ -35,7 +36,6 @@ export const H2 = () => {
 
     let reasons = [];
 
-    // Temp rules
     if (maxTemp === '>35°C') {
       scores['OPzV Standby'] += 2;
       scores['OPzV Solar'] += 2;
@@ -47,7 +47,6 @@ export const H2 = () => {
       scores['OPzS Solar'] += 1;
     }
 
-    // Maintenance rules
     if (maintenanceAvailable === 'No') {
       scores['OPzV Standby'] += 2;
       scores['OPzV Solar'] += 2;
@@ -62,7 +61,6 @@ export const H2 = () => {
       scores['Larga Duración'] += 2;
     }
 
-    // Operation type rules
     if (operationType === 'Ciclado Diario (Solar)') {
       scores['OPzV Solar'] += 3;
       scores['Gel Solar Bloc'] += 3;
@@ -80,7 +78,6 @@ export const H2 = () => {
       scores['QUASAR VRLA'] += 1;
     }
 
-    // Autonomy rules
     if (autonomyReqH2 === '<2 h (Alta descarga)') {
       scores['QUASAR Estándar'] += 2;
       scores['QUASAR Gel Bloc'] += 1;
@@ -90,7 +87,6 @@ export const H2 = () => {
       scores['Gel Leisure Bloc'] += 1;
     }
 
-    // Find the winner
     let maxScore = -999;
     let winner = 'OPzV Standby';
 
@@ -104,7 +100,6 @@ export const H2 = () => {
     return { scores, winner, reasons };
   }, [maxTemp, autonomyReqH2, maintenanceAvailable, operationType]);
 
-  // Update store when evaluation changes
   useEffect(() => {
     setRecommendedFamily(evaluation.winner);
     setSelectedFamilyH4(evaluation.winner);
@@ -120,7 +115,6 @@ export const H2 = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Entradas */}
         <div className="bg-white rounded-lg shadow-md p-6 border-t-4 border-blue-500">
           <h2 className="text-xl font-semibold mb-6 text-blue-800 border-b pb-2">Condiciones del Site</h2>
 
@@ -187,84 +181,92 @@ export const H2 = () => {
                 <option value="Tracción / Carga Oportunidad">Tracción / Carga de Oportunidad</option>
               </select>
             </div>
+
+            <button
+              onClick={() => setIsCompleted(true)}
+              disabled={isCompleted}
+              className="w-full mt-8 bg-blue-600 hover:bg-blue-700 disabled:bg-green-600 text-white font-semibold py-3 rounded-lg transition-colors"
+            >
+              {isCompleted ? '✓ Completado' : 'Completar y ver familia sugerida'}
+            </button>
           </div>
         </div>
 
-        {/* Resultados */}
-        <div className="space-y-6">
-          <div className="bg-blue-50 rounded-lg shadow-md p-6 border border-blue-200">
-            <h2 className="text-xl font-semibold mb-4 text-blue-900 border-b border-blue-200 pb-2">Subfamilia Recomendada</h2>
+        {isCompleted && (
+          <div className="space-y-6">
+            <div className="bg-blue-50 rounded-lg shadow-md p-6 border border-blue-200">
+              <h2 className="text-xl font-semibold mb-4 text-blue-900 border-b border-blue-200 pb-2">Subfamilia Recomendada</h2>
 
-            <div className="flex items-center gap-4 mb-6 bg-white p-4 rounded-lg shadow-sm">
-              <CheckCircle className="w-10 h-10 text-green-500 flex-shrink-0" />
-              <div>
-                <p className="text-sm text-gray-500 uppercase font-semibold tracking-wider">Mejor opción</p>
-                <p className="text-2xl font-bold text-blue-900">{evaluation.winner}</p>
-              </div>
-            </div>
-
-            {evaluation.reasons.length > 0 && (
-              <div className="space-y-2">
-                <p className="font-semibold text-blue-800 text-sm">Razones:</p>
-                <ul className="list-disc pl-5 text-sm text-blue-800 space-y-1">
-                  {evaluation.reasons.map((reason: string, idx: number) => (
-                    <li key={idx}>{reason}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-sm font-semibold mb-3 text-gray-500 uppercase tracking-wider">Puntuación por Subfamilia</h2>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {Object.entries(evaluation.scores).sort((a: any, b: any) => b[1] - a[1]).map(([family, score]: any) => (
-                <div key={family} className="flex justify-between items-center text-sm p-2 rounded hover:bg-gray-50">
-                  <span className={family === evaluation.winner ? 'font-bold text-blue-800' : 'text-gray-600'}>
-                    {family}
-                  </span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                    family === evaluation.winner ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'
-                  }`}>
-                    {score > 0 ? '+' : ''}{score}
-                  </span>
+              <div className="flex items-center gap-4 mb-6 bg-white p-4 rounded-lg shadow-sm">
+                <CheckCircle className="w-10 h-10 text-green-500 flex-shrink-0" />
+                <div>
+                  <p className="text-sm text-gray-500 uppercase font-semibold tracking-wider">Mejor opción</p>
+                  <p className="text-2xl font-bold text-blue-900">{evaluation.winner}</p>
                 </div>
-              ))}
-            </div>
-            <p className="mt-4 text-xs text-gray-500 italic border-t pt-2">
-              Los modelos específicos se seleccionan en H4 (Dimensionador) según los requisitos técnicos exactos.
-            </p>
-          </div>
-        </div>
+              </div>
 
-        {/* Catálogo Dinámico */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4 text-blue-800 border-b pb-2">📦 Catálogo Eternity (603 modelos)</h2>
-
-          {loading ? (
-            <p className="text-gray-500">Cargando catálogo...</p>
-          ) : error ? (
-            <p className="text-red-600">Error al cargar catálogo: {error}</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Object.entries(familias).map(([familiaName, familia]: any) => (
-                <div key={familiaName} className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-bold text-blue-900 mb-2">{familiaName}</h3>
-                  <div className="space-y-1 text-sm">
-                    {Object.entries(familia.subfamilias || {}).map(([subfamName, subfam]: any) => (
-                      <div key={subfamName} className="text-gray-700">
-                        <span className="font-medium">{subfamName}:</span> {subfam.total_modelos} modelos
-                        {subfam.modelos_enriquecidos && (
-                          <span className="text-green-600"> ({subfam.modelos_enriquecidos} con especificaciones)</span>
-                        )}
-                      </div>
+              {evaluation.reasons.length > 0 && (
+                <div className="space-y-2">
+                  <p className="font-semibold text-blue-800 text-sm">Razones:</p>
+                  <ul className="list-disc pl-5 text-sm text-blue-800 space-y-1">
+                    {evaluation.reasons.map((reason: string, idx: number) => (
+                      <li key={idx}>{reason}</li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
-              ))}
+              )}
             </div>
-          )}
-        </div>
+
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-sm font-semibold mb-3 text-gray-500 uppercase tracking-wider">Puntuación por Subfamilia</h2>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {Object.entries(evaluation.scores).sort((a: any, b: any) => b[1] - a[1]).map(([family, score]: any) => (
+                  <div key={family} className="flex justify-between items-center text-sm p-2 rounded hover:bg-gray-50">
+                    <span className={family === evaluation.winner ? 'font-bold text-blue-800' : 'text-gray-600'}>
+                      {family}
+                    </span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                      family === evaluation.winner ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {score > 0 ? '+' : ''}{score}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-4 text-xs text-gray-500 italic border-t pt-2">
+                Los modelos específicos se seleccionan en H4 (Dimensionador) según los requisitos técnicos exactos.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-6 mt-8">
+        <h2 className="text-xl font-semibold mb-4 text-blue-800 border-b pb-2">📦 Catálogo Eternity (603 modelos)</h2>
+
+        {loading ? (
+          <p className="text-gray-500">Cargando catálogo...</p>
+        ) : error ? (
+          <p className="text-red-600">Error al cargar catálogo: {error}</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Object.entries(familias).map(([familiaName, familia]: any) => (
+              <div key={familiaName} className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-bold text-blue-900 mb-2">{familiaName}</h3>
+                <div className="space-y-1 text-sm">
+                  {Object.entries(familia.subfamilias || {}).map(([subfamName, subfam]: any) => (
+                    <div key={subfamName} className="text-gray-700">
+                      <span className="font-medium">{subfamName}:</span> {subfam.total_modelos} modelos
+                      {subfam.modelos_enriquecidos && (
+                        <span className="text-green-600"> ({subfam.modelos_enriquecidos} con especificaciones)</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -4,8 +4,9 @@ import { H4 } from './pages/H4';
 import { H3 } from './pages/H3';
 import { H2 } from './pages/H2';
 import { H1 } from './pages/H1';
+import { Checklist } from './pages/Checklist';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { Layout, Battery, FileText, Settings, BarChart3, Wrench, FileCheck, Presentation, LogOut } from 'lucide-react';
+import { Layout, Battery, FileText, Settings, BarChart3, Wrench, FileCheck, Presentation, LogOut, ClipboardList } from 'lucide-react';
 import { Catalogo } from './pages/Catalogo';
 import { Login } from './pages/Login';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -23,6 +24,14 @@ const Home = () => (
     </div>
     
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Link to="/checklist" className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow flex items-start gap-4 border-l-4 border-purple-600">
+        <ClipboardList className="w-8 h-8 text-purple-600 flex-shrink-0" />
+        <div>
+          <h3 className="font-bold text-lg">Checklist Inicial</h3>
+          <p className="text-sm text-gray-600">Captura datos básicos del cliente.</p>
+        </div>
+      </Link>
+
       <Link to="/catalogo" className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow flex items-start gap-4 border-l-4 border-gray-400">
         <Battery className="w-8 h-8 text-gray-500 flex-shrink-0" />
         <div>
@@ -30,7 +39,7 @@ const Home = () => (
           <p className="text-sm text-gray-600">Catálogo de productos Eternity con especificaciones.</p>
         </div>
       </Link>
-      
+
       <Link to="/h1" className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow flex items-start gap-4 border-l-4 border-red-500">
         <FileText className="w-8 h-8 text-red-500 flex-shrink-0" />
         <div>
@@ -138,9 +147,9 @@ function AppContent() {
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
           <SidebarLink to="/" icon={Layout}>Inicio</SidebarLink>
           <div className="pt-3 pb-2">
-            <p className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Herramientas</p>
+            <p className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Flujo de Venta</p>
           </div>
-          <SidebarLink to="/catalogo" icon={Battery}>Catálogo</SidebarLink>
+          <SidebarLink to="/checklist" icon={ClipboardList}>Checklist Inicial</SidebarLink>
           <SidebarLink to="/h1" icon={FileText}>H1 · Dolor Cliente</SidebarLink>
           <SidebarLink to="/h2" icon={Settings}>H2 · Selector Familia</SidebarLink>
           <SidebarLink to="/h3" icon={BarChart3}>H3 · TCO</SidebarLink>
@@ -181,6 +190,7 @@ function AppContent() {
 
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/checklist" element={<Checklist />} />
           <Route path="/catalogo" element={<Catalogo />} />
           <Route path="/h1" element={<H1 />} />
           <Route path="/h2" element={<H2 />} />

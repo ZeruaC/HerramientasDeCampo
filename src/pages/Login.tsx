@@ -147,7 +147,7 @@ export function Login() {
       <div className="bg-gradient-to-r from-green-400 via-teal-400 to-cyan-400 py-4">
         <div className="text-center">
           <p className="text-slate-800 text-xs font-medium">
-            Versión 3.0 · 2026-07-18 · Material de formación interno
+            Versión 4.1 · 2026-07-26 · Material de formación interno
           </p>
           <p className="text-slate-700 text-xs mt-1">
             © 2026 Balore Engineering. Todos los derechos reservados.
