@@ -74,6 +74,7 @@ export const H2 = () => {
       reasons.push("Operación de tracción: QUASAR y Larga Duración recomendados para ciclos profundos.");
     } else {
       scores['OPzV Standby'] += 2;
+      scores['OPzS Standby'] += 2;
       scores['Gel Leisure Bloc'] += 1;
       scores['QUASAR VRLA'] += 1;
     }
