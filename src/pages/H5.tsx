@@ -86,15 +86,19 @@ export const H5 = () => {
         inverter_efficiency: inverterEfficiency || undefined,
       };
 
-      if (proposalNumber) {
-        await updateProposalByNumber(proposalNumber, proposalData);
-        setSaveMessage(`✅ Propuesta actualizada: ${proposalNumber}`);
-      } else {
-        const propNum = await saveProposal(clientName, proposalData);
-        setProposalNumber(propNum);
-        setCurrentProposalNumber(propNum);
-        setSaveMessage(`✅ Propuesta guardada: ${propNum}`);
-      }
+      // Guardar SIEMPRE crea una propuesta nueva, aunque se haya abierto una
+      // anterior desde el buscador: reemitir o modificar una oferta no debe
+      // tocar los datos de la que ya existía (puede estar firmada y enviada).
+      const wasReopened = !!proposalNumber;
+      const propNum = await saveProposal(clientName, proposalData);
+      setProposalNumber(propNum);
+      setCurrentProposalNumber(propNum);
+      setSignedAt(null);
+      setSaveMessage(
+        wasReopened
+          ? `✅ Nueva propuesta creada a partir de la anterior: ${propNum}`
+          : `✅ Propuesta guardada: ${propNum}`
+      );
     } catch (err: any) {
       setSaveMessage(`❌ Error: ${err.message}`);
     } finally {
