@@ -92,7 +92,7 @@ export const H1 = () => {
                   type="number"
                   className="w-full p-2 border border-gray-300 rounded-md bg-white"
                   value={audit.voltajeSistema || ''}
-                  onChange={(e) => handleProblemChange('voltajeSistema', Number(e.target.value))}
+                  onChange={(e) => handleProblemChange('voltajeSistema', e.target.value)}
                   placeholder="ej: 48"
                 />
               </div>
@@ -102,7 +102,7 @@ export const H1 = () => {
                   type="number"
                   className="w-full p-2 border border-gray-300 rounded-md bg-white"
                   value={audit.capacidadAh || ''}
-                  onChange={(e) => handleProblemChange('capacidadAh', Number(e.target.value))}
+                  onChange={(e) => handleProblemChange('capacidadAh', e.target.value)}
                   placeholder="ej: 1000"
                 />
               </div>
@@ -125,7 +125,7 @@ export const H1 = () => {
                   type="number"
                   className="w-full p-2 border border-gray-300 rounded-md bg-white"
                   value={audit.numeroElementos || ''}
-                  onChange={(e) => handleProblemChange('numeroElementos', Number(e.target.value))}
+                  onChange={(e) => handleProblemChange('numeroElementos', e.target.value)}
                   placeholder="ej: 24"
                 />
               </div>
@@ -135,7 +135,7 @@ export const H1 = () => {
                   type="number"
                   className="w-full p-2 border border-gray-300 rounded-md bg-white"
                   value={audit.anosServicio || ''}
-                  onChange={(e) => handleProblemChange('anosServicio', Number(e.target.value))}
+                  onChange={(e) => handleProblemChange('anosServicio', e.target.value)}
                   placeholder="ej: 5"
                 />
               </div>
@@ -197,7 +197,7 @@ export const H1 = () => {
                 <label key={key} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={audit[key as keyof typeof audit] || false}
+                    checked={!!(audit[key as keyof typeof audit])}
                     onChange={(e) => handleProblemChange(key, e.target.checked)}
                     className="w-4 h-4"
                   />
