@@ -5,17 +5,20 @@ import { useStore } from '../store/useStore';
 import { useCatalog } from '../hooks/useCatalog';
 import { useProposals } from '../hooks/useProposals';
 import { useAuth } from '../context/AuthContext';
-import { Presentation, Building, Battery, TrendingUp, ArrowRight, Download, Save } from 'lucide-react';
+import { getPDFPath, hasPDF } from '../data/pdfMapping';
+import { Presentation, Building, Battery, TrendingUp, Download, Save, FileText, PenLine } from 'lucide-react';
 
 export const H5 = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSigning, setIsSigning] = useState(false);
   const [proposalNumber, setProposalNumber] = useState('');
   const [saveMessage, setSaveMessage] = useState('');
+  const [signedAt, setSignedAt] = useState<string | null>(null);
 
   const { user } = useAuth();
-  const { saveProposal } = useProposals();
+  const { saveProposal, updateProposalByNumber } = useProposals();
 
   const {
     clientName, sector,
@@ -64,6 +67,25 @@ export const H5 = () => {
       setSaveMessage(`❌ Error: ${err.message}`);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSign = async (checked: boolean) => {
+    if (!proposalNumber) return;
+    setIsSigning(true);
+    try {
+      if (checked) {
+        const now = new Date().toISOString();
+        await updateProposalByNumber(proposalNumber, { signed_at: now });
+        setSignedAt(now);
+      } else {
+        await updateProposalByNumber(proposalNumber, { signed_at: null as unknown as string });
+        setSignedAt(null);
+      }
+    } catch (err: any) {
+      setSaveMessage(`❌ Error al firmar: ${err.message}`);
+    } finally {
+      setIsSigning(false);
     }
   };
 
@@ -194,6 +216,17 @@ export const H5 = () => {
               <p className="font-semibold text-gray-800">{autonomyReqH4} horas</p>
             </div>
           </div>
+          {hasPDF(recommendedFamily) && (
+            <a
+              href={getPDFPath(recommendedFamily)!}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 print:hidden inline-flex items-center gap-2 text-sm font-medium text-indigo-700 hover:text-indigo-900 border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-md transition-colors"
+            >
+              <FileText className="w-4 h-4" />
+              Ver ficha técnica de {recommendedFamily} (adjuntar al enviar la propuesta)
+            </a>
+          )}
         </section>
 
         {/* 3. Justificación Económica */}
@@ -226,29 +259,48 @@ export const H5 = () => {
           </div>
         </section>
 
-        {/* 4. Siguientes Pasos */}
+        {/* 4. Firma y Validez */}
         <section className="bg-white rounded-lg shadow-sm border p-6">
           <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4 border-b pb-2">
-            <ArrowRight className="w-5 h-5 text-indigo-500" />
-            4. Siguiente Paso
+            <PenLine className="w-5 h-5 text-indigo-500" />
+            4. Firma
           </h2>
           <div className="flex gap-4 items-center bg-indigo-50 p-4 rounded border border-indigo-100">
-            <input type="checkbox" className="w-5 h-5 text-indigo-600 rounded" />
-            <p className="text-indigo-900 font-medium">
-              Auditoría técnica gratuita en sitio para validar el cargador existente y condiciones finales de instalación. 
-              <br /><span className="text-sm font-normal">Fecha propuesta: ___/___/20__</span>
-            </p>
+            <input
+              type="checkbox"
+              className="w-5 h-5 text-indigo-600 rounded print:hidden"
+              checked={!!signedAt}
+              disabled={!proposalNumber || isSigning}
+              onChange={(e) => handleSign(e.target.checked)}
+            />
+            <div className="text-indigo-900">
+              <p className="font-medium">Firmo como Asesor Técnico Comercial de PELSA</p>
+              {signedAt ? (
+                <p className="text-sm">
+                  Firmado el {new Date(signedAt).toLocaleDateString()} a las {new Date(signedAt).toLocaleTimeString()} — válida hasta el{' '}
+                  {new Date(new Date(signedAt).getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()} (30 días).
+                </p>
+              ) : (
+                <p className="text-sm font-normal text-indigo-700">
+                  {proposalNumber ? 'Al firmar, empiezan a contar los 30 días de validez.' : 'Guarda la propuesta primero para poder firmarla.'}
+                </p>
+              )}
+            </div>
           </div>
         </section>
 
         <div className="pt-8 flex justify-between items-end border-t border-gray-300">
           <div>
             <p className="text-xs text-gray-500">Documento generado el {new Date().toLocaleDateString()}</p>
-            <p className="text-xs text-gray-500">Validez de la propuesta: 30 días</p>
+            <p className="text-xs text-gray-500">
+              {signedAt
+                ? `Válida hasta el ${new Date(new Date(signedAt).getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}`
+                : 'Validez de la propuesta: 30 días desde la firma'}
+            </p>
           </div>
           <div className="text-right">
-            <p className="text-sm font-bold text-gray-700">Eternity Technologies</p>
-            <p className="text-xs text-gray-500 mt-8 border-t border-gray-400 pt-1 inline-block w-48 text-center">Firma Asesor / Comercial</p>
+            <p className="text-sm font-bold text-gray-700">Grupo PELSA</p>
+            <p className="text-xs text-gray-500 mt-8 border-t border-gray-400 pt-1 inline-block w-48 text-center">Firma Asesor Técnico Comercial</p>
           </div>
         </div>
       </div>

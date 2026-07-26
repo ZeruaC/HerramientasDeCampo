@@ -18,6 +18,7 @@ export interface Proposal {
   autonomy_hours?: number;
   status: string;
   created_at: string;
+  signed_at?: string;
 }
 
 export function useProposals() {
@@ -100,5 +101,25 @@ export function useProposals() {
     }
   };
 
-  return { saveProposal, getProposals, updateProposal, loading, error };
+  const updateProposalByNumber = async (proposalNumber: string, updates: Partial<Proposal>) => {
+    if (!user) throw new Error('No authenticated user');
+
+    setLoading(true);
+    try {
+      const { error: updateError } = await supabase
+        .from('proposals')
+        .update(updates)
+        .eq('proposal_number', proposalNumber)
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+    } catch (err: any) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { saveProposal, getProposals, updateProposal, updateProposalByNumber, loading, error };
 }
