@@ -38,12 +38,17 @@ interface StoreState {
   setAudit: (audit: Partial<AuditData>) => void;
 
   // H1 Data (Dolor del Cliente)
+  outagesPerYear: number;
+  setOutagesPerYear: (outages: number) => void;
+  durationHours: number;
+  setDurationHours: (hours: number) => void;
+  costPerHour: number;
+  setCostPerHour: (cost: number) => void;
+
   outageHoursPerWeek: number;
   setOutageHoursPerWeek: (hours: number) => void;
   affectedLines: number;
   setAffectedLines: (lines: number) => void;
-  costPerHour: number;
-  setCostPerHour: (cost: number) => void;
   fixedCostPerIncident: number;
   setFixedCostPerIncident: (cost: number) => void;
   incidentsPerWeek: number;
@@ -120,12 +125,17 @@ export const useStore = create<StoreState>((set) => ({
   setAudit: (audit) => set((state) => ({ audit: { ...state.audit, ...audit } })),
 
   // H1
+  outagesPerYear: 0,
+  setOutagesPerYear: (outages) => set({ outagesPerYear: outages }),
+  durationHours: 0,
+  setDurationHours: (hours) => set({ durationHours: hours }),
+  costPerHour: 0,
+  setCostPerHour: (cost) => set({ costPerHour: cost }),
+
   outageHoursPerWeek: 0,
   setOutageHoursPerWeek: (hours) => set({ outageHoursPerWeek: hours }),
   affectedLines: 0,
   setAffectedLines: (lines) => set({ affectedLines: lines }),
-  costPerHour: 0,
-  setCostPerHour: (cost) => set({ costPerHour: cost }),
   fixedCostPerIncident: 0,
   setFixedCostPerIncident: (cost) => set({ fixedCostPerIncident: cost }),
   incidentsPerWeek: 0,

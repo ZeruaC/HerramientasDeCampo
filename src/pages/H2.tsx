@@ -241,33 +241,6 @@ export const H2 = () => {
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6 mt-8">
-        <h2 className="text-xl font-semibold mb-4 text-blue-800 border-b pb-2">📦 Catálogo Eternity (603 modelos)</h2>
-
-        {loading ? (
-          <p className="text-gray-500">Cargando catálogo...</p>
-        ) : error ? (
-          <p className="text-red-600">Error al cargar catálogo: {error}</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Object.entries(familias).map(([familiaName, familia]: any) => (
-              <div key={familiaName} className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-bold text-blue-900 mb-2">{familiaName}</h3>
-                <div className="space-y-1 text-sm">
-                  {Object.entries(familia.subfamilias || {}).map(([subfamName, subfam]: any) => (
-                    <div key={subfamName} className="text-gray-700">
-                      <span className="font-medium">{subfamName}:</span> {subfam.total_modelos} modelos
-                      {subfam.modelos_enriquecidos && (
-                        <span className="text-green-600"> ({subfam.modelos_enriquecidos} con especificaciones)</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 };

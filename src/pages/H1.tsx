@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { AlertCircle, DollarSign, Clock, Building2, Zap, CheckCircle2 } from 'lucide-react';
 
@@ -8,13 +7,15 @@ export const H1 = () => {
     sector,
     audit,
     setAudit,
+    outagesPerYear,
+    setOutagesPerYear,
+    durationHours,
+    setDurationHours,
+    costPerHour,
+    setCostPerHour,
   } = useStore();
 
-  const [outages_per_year, setOutagesPerYear] = useState(0);
-  const [duration_hours, setDurationHours] = useState(0);
-  const [cost_per_hour, setCostPerHour] = useState(0);
-
-  const annualLoss = outages_per_year * duration_hours * cost_per_hour;
+  const annualLoss = outagesPerYear * durationHours * costPerHour;
   const fiveYearLoss = annualLoss * 5;
 
   const handleProblemChange = (field: string, value: boolean | string) => {
@@ -234,7 +235,7 @@ export const H1 = () => {
                     type="number"
                     min="0"
                     className="w-full p-2 border border-gray-300 rounded-md"
-                    value={outages_per_year || ''}
+                    value={outagesPerYear || ''}
                     onChange={(e) => setOutagesPerYear(Number(e.target.value))}
                     placeholder="ej: 12"
                   />
@@ -248,7 +249,7 @@ export const H1 = () => {
                     type="number"
                     min="0"
                     className="w-full p-2 border border-gray-300 rounded-md"
-                    value={duration_hours || ''}
+                    value={durationHours || ''}
                     onChange={(e) => setDurationHours(Number(e.target.value))}
                     placeholder="ej: 4"
                   />
@@ -262,7 +263,7 @@ export const H1 = () => {
                     type="number"
                     min="0"
                     className="w-full p-2 border border-gray-300 rounded-md"
-                    value={cost_per_hour || ''}
+                    value={costPerHour || ''}
                     onChange={(e) => setCostPerHour(Number(e.target.value))}
                     placeholder="ej: 500"
                   />
@@ -287,7 +288,7 @@ export const H1 = () => {
               <div>
                 <p className="text-sm text-red-600 mb-1">Cálculo:</p>
                 <p className="text-xs text-gray-600 mb-2">
-                  {outages_per_year} paradas/año × {duration_hours}h × ${cost_per_hour}/h
+                  {outagesPerYear} paradas/año × {durationHours}h × ${costPerHour}/h
                 </p>
               </div>
               <div>

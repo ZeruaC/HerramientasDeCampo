@@ -19,7 +19,7 @@ export const H5 = () => {
 
   const {
     clientName, sector,
-    outageHoursPerWeek, affectedLines, costPerHour, fixedCostPerIncident, incidentsPerWeek,
+    outagesPerYear, durationHours, costPerHour,
     recommendedFamily,
     eternityCapex, genericCapex, genericLife, genericMaint, genericInstall, eternityLife, eternityMaint, eternityInstall,
     systemVoltage, selectedModelH4, autonomyReqH4
@@ -27,9 +27,17 @@ export const H5 = () => {
 
   const { modelos, loading } = useCatalog();
 
+  // Calculate H1 losses
+  const annualLoss = outagesPerYear * durationHours * costPerHour;
+  const fiveYearLoss = annualLoss * 5;
+
   const handleSaveProposal = async () => {
     if (!clientName) {
-      setSaveMessage('Por favor ingresa el nombre del cliente en H1');
+      setSaveMessage('Por favor ingresa cliente, sector y datos económicos en H1');
+      return;
+    }
+    if (!outagesPerYear || !durationHours || !costPerHour) {
+      setSaveMessage('Por favor completa los datos económicos en H1');
       return;
     }
 
@@ -39,9 +47,6 @@ export const H5 = () => {
     try {
       const propNum = await saveProposal(clientName, {
         sector: sector || undefined,
-        outage_hours_per_week: outageHoursPerWeek || undefined,
-        affected_lines: affectedLines || undefined,
-        cost_per_hour: costPerHour || undefined,
         annual_loss: annualLoss,
         recommended_family: recommendedFamily || undefined,
         eternity_capex: eternityCapex || undefined,
@@ -74,11 +79,6 @@ export const H5 = () => {
 
     html2pdf().set(options).from(element).save().finally(() => setIsExporting(false));
   };
-
-  // Re-calculate H1
-  const weeklyLoss = (outageHoursPerWeek * affectedLines * costPerHour) + (incidentsPerWeek * fixedCostPerIncident);
-  const annualLoss = weeklyLoss * 52;
-  const fiveYearLoss = annualLoss * 5;
 
   // Re-calculate H3 (10 years)
   const calcReplacements = (horizon: number, life: number) => Math.ceil(horizon / life) - 1;
