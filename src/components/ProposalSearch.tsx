@@ -33,6 +33,7 @@ export const ProposalSearch = () => {
     store.setContactPerson(p.contact_person || '');
     store.setPhoneNumber(p.phone_number || '');
     store.setLocation(p.location || '');
+    useStore.setState({ audit: p.audit_data || {} });
     store.setOutagesPerYear(p.outages_per_year || 0);
     store.setDurationHours(p.duration_hours || 0);
     store.setCostPerHour(p.cost_per_hour || 0);

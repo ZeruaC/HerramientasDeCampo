@@ -10,6 +10,7 @@ export interface Proposal {
   contact_person?: string;
   phone_number?: string;
   location?: string;
+  audit_data?: Record<string, any>;
   outages_per_year?: number;
   duration_hours?: number;
   cost_per_hour?: number;
