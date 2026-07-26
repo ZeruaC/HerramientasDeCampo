@@ -216,16 +216,11 @@ export const H4 = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Familia Eternity (de H2 o manual)</label>
-                <select
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500 bg-white"
-                  value={selectedFamilyH4}
-                  onChange={(e) => setSelectedFamilyH4(e.target.value)}
-                >
-                  {uniqueFamilies.map(f => (
-                    <option key={f} value={f}>{f}</option>
-                  ))}
-                </select>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Familia Eternity (seleccionada en H2)</label>
+                <div className="w-full p-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700 font-semibold">
+                  {selectedFamilyH4}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Cambiar en H2 si es necesario</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Profundidad de descarga máx. (DOD)</label>

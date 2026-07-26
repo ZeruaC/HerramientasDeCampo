@@ -45,15 +45,18 @@ export const H5 = () => {
     setSaveMessage('');
 
     try {
-      const propNum = await saveProposal(clientName, {
-        sector: sector || undefined,
+      const proposalData: any = {
         annual_loss: annualLoss,
-        recommended_family: recommendedFamily || undefined,
-        eternity_capex: eternityCapex || undefined,
-        system_voltage: systemVoltage || undefined,
-        selected_model: selectedModelH4 || undefined,
-        autonomy_hours: autonomyReqH4 || undefined,
-      });
+      };
+
+      if (sector) proposalData.sector = sector;
+      if (recommendedFamily) proposalData.recommended_family = recommendedFamily;
+      if (eternityCapex > 0) proposalData.eternity_capex = eternityCapex;
+      if (systemVoltage > 0) proposalData.system_voltage = systemVoltage;
+      if (selectedModelH4) proposalData.selected_model = selectedModelH4;
+      if (autonomyReqH4 > 0) proposalData.autonomy_hours = autonomyReqH4;
+
+      const propNum = await saveProposal(clientName, proposalData);
 
       setProposalNumber(propNum);
       setSaveMessage(`✅ Propuesta guardada: ${propNum}`);

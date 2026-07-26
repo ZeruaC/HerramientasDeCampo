@@ -219,22 +219,25 @@ export const H1 = () => {
           </div>
 
           {/* SECCIÓN D: Datos Económicos Simplificados */}
-          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4 text-blue-800 border-b pb-2 flex items-center gap-2">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-md p-6 border-2 border-green-300">
+            <h2 className="text-xl font-semibold mb-4 text-green-800 border-b-2 border-green-300 pb-2 flex items-center gap-2">
               <DollarSign className="w-5 h-5" />
-              D. Impacto Económico por Falta de Energía
+              D. Impacto Económico por Falta de Energía ⭐ REQUERIDO PARA H5
             </h2>
+            <div className="p-4 bg-red-100 border-l-4 border-red-600 mb-4 text-red-800 text-sm">
+              <strong>⚠️ ESTOS DATOS SON OBLIGATORIOS para H5 (Propuesta)</strong> — sin ellos no se puede generar la propuesta económica.
+            </div>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                    ¿Cuántas paradas/año?
+                    <Clock className="w-4 h-4 text-red-600" />
+                    ¿Cuántas paradas/año? *
                   </label>
                   <input
                     type="number"
                     min="0"
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    className="w-full p-3 border-2 border-red-300 rounded-md bg-red-50 focus:ring-red-500 focus:border-red-500"
                     value={outagesPerYear || ''}
                     onChange={(e) => setOutagesPerYear(Number(e.target.value))}
                     placeholder="ej: 12"
@@ -242,13 +245,13 @@ export const H1 = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                    Duración promedio (horas)
+                    <Clock className="w-4 h-4 text-red-600" />
+                    Duración promedio (horas) *
                   </label>
                   <input
                     type="number"
                     min="0"
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    className="w-full p-3 border-2 border-red-300 rounded-md bg-red-50 focus:ring-red-500 focus:border-red-500"
                     value={durationHours || ''}
                     onChange={(e) => setDurationHours(Number(e.target.value))}
                     placeholder="ej: 4"
@@ -256,13 +259,13 @@ export const H1 = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-gray-500" />
-                    Coste/hora sin energía (USD)
+                    <DollarSign className="w-4 h-4 text-red-600" />
+                    Coste/hora sin energía (USD) *
                   </label>
                   <input
                     type="number"
                     min="0"
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    className="w-full p-3 border-2 border-red-300 rounded-md bg-red-50 focus:ring-red-500 focus:border-red-500"
                     value={costPerHour || ''}
                     onChange={(e) => setCostPerHour(Number(e.target.value))}
                     placeholder="ej: 500"
