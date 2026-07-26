@@ -38,7 +38,7 @@ export const ProposalSearch = () => {
     store.setAutonomyReqH2(p.autonomy_req_h2 || '>8 h');
     store.setMaintenanceAvailable(p.maintenance_available || 'No');
     store.setOperationType(p.operation_type || 'Standby/Flotación (UPS)');
-    store.setAvailableSpace(p.available_space || 'Reducido o sin ventilación');
+    store.setAvailableSpace(p.available_space || 'Reducido');
     store.setOutagesPerYear(p.outages_per_year || 0);
     store.setDurationHours(p.duration_hours || 0);
     store.setCostPerHour(p.cost_per_hour || 0);

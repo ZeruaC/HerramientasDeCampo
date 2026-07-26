@@ -157,7 +157,7 @@ export const useStore = create<StoreState>((set) => ({
   setMaintenanceAvailable: (maint) => set({ maintenanceAvailable: maint }),
   operationType: 'Standby/Flotación (UPS)',
   setOperationType: (op) => set({ operationType: op }),
-  availableSpace: 'Reducido o sin ventilación',
+  availableSpace: 'Reducido',
   setAvailableSpace: (space) => set({ availableSpace: space }),
   recommendedFamily: '',
   setRecommendedFamily: (family) => set({ recommendedFamily: family }),

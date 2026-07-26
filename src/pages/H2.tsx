@@ -29,8 +29,11 @@ export const H2 = () => {
     if (audit.uso && audit.uso !== operationType) {
       setOperationType(audit.uso);
     }
+    if (audit.espacioDisponible && audit.espacioDisponible !== availableSpace) {
+      setAvailableSpace(audit.espacioDisponible);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [audit.mantenimientoDisponible, audit.uso]);
+  }, [audit.mantenimientoDisponible, audit.uso, audit.espacioDisponible]);
 
   const evaluation = useMemo(() => {
     let scores = {
@@ -101,6 +104,20 @@ export const H2 = () => {
       scores['Gel Leisure Bloc'] += 1;
     }
 
+    if (availableSpace === 'Muy reducido') {
+      scores['Gel Leisure Bloc'] += 2;
+      scores['Gel Solar Bloc'] += 2;
+      scores['QUASAR Gel Bloc'] += 2;
+      scores['QUASAR Flooded Bloc'] += 1;
+      scores['OPzS Standby'] -= 2;
+      scores['OPzS Solar'] -= 1;
+      scores['Larga Duración'] -= 2;
+      reasons.push("Espacio muy reducido: formatos bloc compactos son preferibles a vasos OPzS/Larga Duración.");
+    } else if (availableSpace === 'Reducido') {
+      scores['Gel Leisure Bloc'] += 1;
+      scores['QUASAR Gel Bloc'] += 1;
+    }
+
     let maxScore = -999;
     let winner = 'OPzV Standby';
 
@@ -112,7 +129,7 @@ export const H2 = () => {
     });
 
     return { scores, winner, reasons };
-  }, [maxTemp, autonomyReqH2, maintenanceAvailable, operationType]);
+  }, [maxTemp, autonomyReqH2, maintenanceAvailable, operationType, availableSpace]);
 
   useEffect(() => {
     setRecommendedFamily(evaluation.winner);
@@ -209,6 +226,25 @@ export const H2 = () => {
                 <option value="Standby/Flotación (UPS)">Standby / Flotación (Cortes raros, UPS)</option>
                 <option value="Ciclado Diario (Solar)">Ciclado Diario (Solar / Off-grid)</option>
                 <option value="Tracción / Carga Oportunidad">Tracción / Carga de Oportunidad</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                <Battery className="w-4 h-4 text-purple-500" />
+                Espacio disponible
+                {audit.espacioDisponible && (
+                  <span className="text-xs font-normal text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Prellenado desde H1</span>
+                )}
+              </label>
+              <select
+                className="w-full p-2 border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500"
+                value={availableSpace}
+                onChange={(e) => setAvailableSpace(e.target.value)}
+              >
+                <option value="Amplio">Amplio</option>
+                <option value="Reducido">Reducido</option>
+                <option value="Muy reducido">Muy reducido</option>
               </select>
             </div>
 
