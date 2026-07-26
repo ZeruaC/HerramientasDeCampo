@@ -10,6 +10,8 @@ import { Layout, Battery, FileText, Settings, BarChart3, Wrench, FileCheck, Pres
 import { Catalogo } from './pages/Catalogo';
 import { Login } from './pages/Login';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { Header } from './components/Header';
+import { Footer } from './components/Footer';
 
 // Placeholder components for pages
 const Home = () => (
@@ -164,33 +166,24 @@ function AppContent() {
           </div>
         </div>
       </aside>
-      <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 relative">
-        {/* Logo PELSA - Esquina superior izquierda (+25%) */}
-        <div className="absolute top-4 left-4 h-20 z-20 pointer-events-none">
-          <img src="/logos/pelsa-logo.PNG" alt="PELSA" className="h-full object-contain opacity-80" />
+      <main className="flex-1 flex flex-col bg-gradient-to-br from-slate-50 to-blue-50 min-w-0">
+        <Header />
+
+        <div className="flex-1 overflow-y-auto">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/checklist" element={<Checklist />} />
+            <Route path="/catalogo" element={<Catalogo />} />
+            <Route path="/h1" element={<H1 />} />
+            <Route path="/h2" element={<H2 />} />
+            <Route path="/h3" element={<H3 />} />
+            <Route path="/h4" element={<H4 />} />
+            <Route path="/h5" element={<H5 />} />
+            <Route path="/h6" element={<H6 />} />
+          </Routes>
         </div>
 
-        {/* Logo Eternity - Esquina superior derecha */}
-        <div className="absolute top-4 right-4 h-14 z-20 pointer-events-none">
-          <img src="/logos/eternity-logo.png" alt="Eternity" className="h-full object-contain opacity-80" />
-        </div>
-
-        {/* Logo Balore - Esquina inferior derecha */}
-        <div className="absolute bottom-4 right-4 h-12 z-20 pointer-events-none">
-          <img src="/logos/balore-logo.png" alt="Balore" className="h-full object-contain opacity-70" />
-        </div>
-
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/checklist" element={<Checklist />} />
-          <Route path="/catalogo" element={<Catalogo />} />
-          <Route path="/h1" element={<H1 />} />
-          <Route path="/h2" element={<H2 />} />
-          <Route path="/h3" element={<H3 />} />
-          <Route path="/h4" element={<H4 />} />
-          <Route path="/h5" element={<H5 />} />
-          <Route path="/h6" element={<H6 />} />
-        </Routes>
+        <Footer />
       </main>
     </div>
   );
