@@ -38,13 +38,9 @@ export function useProposals() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const generateProposalNumber = () => {
-    const now = new Date();
-    const date = now.toISOString().split('T')[0]; // YYYY-MM-DD
-    const timestamp = now.getTime().toString().slice(-3); // Last 3 digits of timestamp
-    return `PROP-${date}-${timestamp}`;
-  };
-
+  // El número de propuesta (OF-1027, OF-1028, ...) lo asigna la base de
+  // datos mediante una SEQUENCE (ver migración 006): es atómico y único por
+  // construcción, no hace falta generarlo ni reintentar en el cliente.
   const saveProposal = async (clientName: string, data: Partial<Proposal>) => {
     if (!user) throw new Error('No authenticated user');
 
@@ -52,17 +48,19 @@ export function useProposals() {
     setError('');
 
     try {
-      const proposal_number = generateProposalNumber();
-      const { error: insertError } = await supabase.from('proposals').insert({
-        user_id: user.id,
-        proposal_number,
-        client_name: clientName,
-        status: 'draft',
-        ...data,
-      });
+      const { data: inserted, error: insertError } = await supabase
+        .from('proposals')
+        .insert({
+          user_id: user.id,
+          client_name: clientName,
+          status: 'draft',
+          ...data,
+        })
+        .select('proposal_number')
+        .single();
 
       if (insertError) throw insertError;
-      return proposal_number;
+      return inserted.proposal_number as string;
     } catch (err: any) {
       const message = err.message || 'Error saving proposal';
       setError(message);
