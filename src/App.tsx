@@ -65,18 +65,18 @@ const Home = () => (
       </Link>
       
       <Link to="/h5" className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow flex items-start gap-4 border-l-4 border-purple-500">
-        <FileCheck className="w-8 h-8 text-purple-500 flex-shrink-0" />
+        <Presentation className="w-8 h-8 text-purple-500 flex-shrink-0" />
         <div>
-          <h3 className="font-bold text-lg">H5 · Checklist Garantía</h3>
-          <p className="text-sm text-gray-600">Checklist de instalación y registro de garantía.</p>
+          <h3 className="font-bold text-lg">H5 · Propuesta</h3>
+          <p className="text-sm text-gray-600">Hoja resumen ejecutiva para enviar al cliente.</p>
         </div>
       </Link>
-      
+
       <Link to="/h6" className="md:col-span-2 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg shadow hover:shadow-md transition-shadow flex items-start gap-4 border-l-4 border-indigo-600">
-        <Presentation className="w-8 h-8 text-indigo-600 flex-shrink-0" />
+        <FileCheck className="w-8 h-8 text-indigo-600 flex-shrink-0" />
         <div>
-          <h3 className="font-bold text-lg">H6 · Propuesta ROI</h3>
-          <p className="text-sm text-gray-600">Hoja resumen ejecutiva — consolida automáticamente H1 a H4.</p>
+          <h3 className="font-bold text-lg">H6 · Checklist</h3>
+          <p className="text-sm text-gray-600">Checklist de puesta en marcha.</p>
         </div>
       </Link>
     </div>
