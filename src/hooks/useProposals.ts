@@ -37,6 +37,8 @@ export interface Proposal {
   min_temp_h4?: number;
   max_dod?: number;
   inverter_efficiency?: number;
+  tco_savings_10y?: number;
+  payback_months?: number;
   status: string;
   created_at: string;
   signed_at?: string;

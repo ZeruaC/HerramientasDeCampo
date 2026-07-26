@@ -96,6 +96,8 @@ export const H5 = () => {
         min_temp_h4: minTempH4 || undefined,
         max_dod: maxDod || undefined,
         inverter_efficiency: inverterEfficiency || undefined,
+        tco_savings_10y: savings10 || undefined,
+        payback_months: paybackMonths || undefined,
       };
 
       // Guardar SIEMPRE crea una propuesta nueva, aunque se haya abierto una
