@@ -1,23 +1,50 @@
-import { useState, useMemo, useEffect, Fragment, useRef } from 'react';
+import { useState, useEffect, Fragment, useRef } from 'react';
 import html2pdf from 'html2pdf.js';
 
 import { ClipboardCheck, Check, X, Printer, Save } from 'lucide-react';
 import { useStore } from '../store/useStore';
-import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
+import { useProposals } from '../hooks/useProposals';
 
 export const H6 = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
-  const [proposalNumber, setProposalNumber] = useState('');
-  const { clientName, selectedModelH4 } = useStore();
-  const { user } = useAuth();
+  const { clientName, selectedModelH4, currentProposalNumber } = useStore();
+  const { updateProposalByNumber, getProposalByNumber } = useProposals();
+  const [proposalNumber, setProposalNumber] = useState(currentProposalNumber);
+
+  // Local state for the checklist specific fields
+  const [checklistData, setChecklistData] = useState({
+    ubicacion: '',
+    fecha: new Date().toISOString().split('T')[0],
+    tecnico: '',
+    cantidad: '',
+    serie: ''
+  });
+  const [checks, setChecks] = useState<Record<number, { status: 'OK' | 'NOK' | null, value: string, obs: string }>>({});
+
+  // Recupera el checklist ya guardado de esa propuesta, para no perderlo al
+  // re-guardar. Se dispara al abrir desde el buscador (prefilla el número) y
+  // también al escribir el número a mano y salir del campo.
+  const loadChecklist = async (number: string) => {
+    if (!number) return;
+    const p = await getProposalByNumber(number);
+    if (p?.checklist_data) {
+      const data = p.checklist_data as any;
+      if (data.metadata) setChecklistData((prev) => ({ ...prev, ...data.metadata }));
+      if (data.checks) setChecks(data.checks);
+    }
+  };
+
+  useEffect(() => {
+    loadChecklist(proposalNumber);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSaveChecklist = async () => {
     if (!proposalNumber) {
-      setSaveMessage('⚠️ Ingresa el número de propuesta (PROP-...)');
+      setSaveMessage('⚠️ Ingresa el número de propuesta (OF-...)');
       return;
     }
 
@@ -25,22 +52,10 @@ export const H6 = () => {
     setSaveMessage('');
 
     try {
-      const { data, error } = await supabase
-        .from('proposals')
-        .update({
-          status: isApto ? 'accepted' : 'draft',
-          updated_at: new Date().toISOString()
-        })
-        .eq('proposal_number', proposalNumber)
-        .eq('user_id', user?.id)
-        .select();
-
-      if (error) throw error;
-      if (!data || data.length === 0) {
-        setSaveMessage('❌ Propuesta no encontrada');
-        return;
-      }
-
+      await updateProposalByNumber(proposalNumber, {
+        status: isApto ? 'accepted' : 'draft',
+        checklist_data: { metadata: checklistData, checks },
+      });
       setSaveMessage(`✅ Checklist guardado - Estado: ${isApto ? 'APTO' : 'PENDIENTE'}`);
     } catch (err: any) {
       setSaveMessage(`❌ Error: ${err.message}`);
@@ -64,15 +79,6 @@ export const H6 = () => {
 
     html2pdf().set(options).from(element).save().finally(() => setIsExporting(false));
   };
-  
-  // Local state for the checklist specific fields
-  const [checklistData, setChecklistData] = useState({
-    ubicacion: '',
-    fecha: new Date().toISOString().split('T')[0],
-    tecnico: '',
-    cantidad: '',
-    serie: ''
-  });
 
   const handleDataChange = (field: string, value: string) => {
     setChecklistData((prev: any) => ({ ...prev, [field]: value }));
@@ -103,9 +109,6 @@ export const H6 = () => {
     { id: 19, category: 'D. VALIDACIÓN FINAL', text: 'Registro fotográfico del banco e instalación realizado', hasValue: false },
     { id: 20, category: 'D. VALIDACIÓN FINAL', text: 'Cliente informado del plan de mantenimiento y garantía', hasValue: false },
   ];
-
-  // State for checklist answers
-  const [checks, setChecks] = useState<Record<number, {status: 'OK' | 'NOK' | null, value: string, obs: string}>>({});
 
   const toggleCheck = (id: number, status: 'OK' | 'NOK') => {
     setChecks((prev: any) => ({
@@ -187,13 +190,14 @@ export const H6 = () => {
             <input type="text" className="w-full p-2 border border-gray-300 rounded" value={clientName} readOnly />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nº Propuesta (PROP-...)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nº Propuesta (OF-...)</label>
             <input
               type="text"
               className="w-full p-2 border border-gray-300 rounded bg-blue-50"
-              placeholder="PROP-YYYY-MM-DD-###"
+              placeholder="OF-1027"
               value={proposalNumber}
               onChange={e => setProposalNumber(e.target.value)}
+              onBlur={e => loadChecklist(e.target.value.trim())}
             />
           </div>
           <div>
