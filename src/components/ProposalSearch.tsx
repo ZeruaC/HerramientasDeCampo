@@ -30,6 +30,9 @@ export const ProposalSearch = () => {
     store.setCurrentProposalNumber(p.proposal_number);
     store.setClientName(p.client_name);
     store.setSector(p.sector || '');
+    store.setContactPerson(p.contact_person || '');
+    store.setPhoneNumber(p.phone_number || '');
+    store.setLocation(p.location || '');
     store.setOutagesPerYear(p.outages_per_year || 0);
     store.setDurationHours(p.duration_hours || 0);
     store.setCostPerHour(p.cost_per_hour || 0);

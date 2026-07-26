@@ -23,6 +23,7 @@ export const H5 = () => {
   const {
     currentProposalNumber, setCurrentProposalNumber,
     clientName, sector,
+    contactPerson, phoneNumber, location,
     outagesPerYear, durationHours, costPerHour,
     recommendedFamily, selectedFamilyH4,
     eternityCapex, genericCapex, genericLife, genericMaint, genericInstall, eternityLife, eternityMaint, eternityInstall,
@@ -63,6 +64,9 @@ export const H5 = () => {
     try {
       const proposalData: any = {
         sector: sector || undefined,
+        contact_person: contactPerson || undefined,
+        phone_number: phoneNumber || undefined,
+        location: location || undefined,
         annual_loss: annualLoss,
         outages_per_year: outagesPerYear,
         duration_hours: durationHours,

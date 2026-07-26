@@ -7,6 +7,9 @@ export interface Proposal {
   proposal_number: string;
   client_name: string;
   sector?: string;
+  contact_person?: string;
+  phone_number?: string;
+  location?: string;
   outages_per_year?: number;
   duration_hours?: number;
   cost_per_hour?: number;
