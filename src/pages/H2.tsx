@@ -2,12 +2,13 @@ import { useState, useMemo, useEffect } from 'react';
 
 import { useStore } from '../store/useStore';
 import { useCatalog } from '../hooks/useCatalog';
-import { ThermometerSun, Clock, Wrench, Battery, CheckCircle } from 'lucide-react';
+import { ThermometerSun, Clock, Wrench, Battery, CheckCircle, Info } from 'lucide-react';
 
 export const H2 = () => {
   const [isCompleted, setIsCompleted] = useState(false);
 
   const {
+    audit,
     maxTemp, setMaxTemp,
     autonomyReqH2, setAutonomyReqH2,
     maintenanceAvailable, setMaintenanceAvailable,
@@ -17,7 +18,19 @@ export const H2 = () => {
     setSelectedFamilyH4
   } = useStore();
 
-  const { familias, loading, error } = useCatalog();
+  const { familias, modelos, loading, error } = useCatalog();
+
+  // Prellenar desde los datos ya capturados en H1 (auditoría), en vez de
+  // volver a preguntar lo mismo. El técnico puede seguir ajustándolo aquí.
+  useEffect(() => {
+    if (audit.mantenimientoDisponible && audit.mantenimientoDisponible !== maintenanceAvailable) {
+      setMaintenanceAvailable(audit.mantenimientoDisponible);
+    }
+    if (audit.uso && audit.uso !== operationType) {
+      setOperationType(audit.uso);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audit.mantenimientoDisponible, audit.uso]);
 
   const evaluation = useMemo(() => {
     let scores = {
@@ -106,6 +119,16 @@ export const H2 = () => {
     setSelectedFamilyH4(evaluation.winner);
   }, [evaluation.winner, setRecommendedFamily, setSelectedFamilyH4]);
 
+  // Modelos concretos disponibles dentro de la subfamilia ganadora. El tamaño
+  // exacto (Ah, nº de ramas) se resuelve en H4 con la potencia/autonomía reales,
+  // pero aquí ya se puede ver qué modelos son posibles para esta subfamilia.
+  const winningModels = useMemo(() => {
+    return modelos
+      .filter(m => m.subfamilia === evaluation.winner)
+      .map(m => ({ modelo: m.modelo, ah: m.especificaciones?.capacidad_nominal_ah || 0 }))
+      .sort((a, b) => a.ah - b.ah);
+  }, [modelos, evaluation.winner]);
+
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-6">
@@ -156,6 +179,9 @@ export const H2 = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                 <Wrench className="w-4 h-4 text-gray-500" />
                 ¿Mantenimiento disponible?
+                {audit.mantenimientoDisponible && (
+                  <span className="text-xs font-normal text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Prellenado desde H1</span>
+                )}
               </label>
               <select
                 className="w-full p-2 border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500"
@@ -171,6 +197,9 @@ export const H2 = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                 <Battery className="w-4 h-4 text-green-500" />
                 Tipo de operación
+                {audit.uso && (
+                  <span className="text-xs font-normal text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Prellenado desde H1</span>
+                )}
               </label>
               <select
                 className="w-full p-2 border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500"
@@ -216,6 +245,27 @@ export const H2 = () => {
                   </ul>
                 </div>
               )}
+            </div>
+
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-sm font-semibold mb-3 text-gray-500 uppercase tracking-wider">
+                Modelos posibles en {evaluation.winner}
+              </h2>
+              {winningModels.length > 0 ? (
+                <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                  {winningModels.map(({ modelo, ah }) => (
+                    <span key={modelo} className="text-xs font-medium bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                      {modelo}{ah > 0 ? ` (${ah} Ah)` : ''}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">No hay modelos cargados para esta subfamilia.</p>
+              )}
+              <p className="mt-3 text-xs text-gray-500 italic border-t pt-2 flex items-start gap-1">
+                <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+                El modelo y nº de ramas exactos se calculan en H4 (Dimensionador) según potencia y autonomía reales.
+              </p>
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6">
