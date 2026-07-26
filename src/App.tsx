@@ -32,14 +32,6 @@ const Home = () => (
         </div>
       </Link>
 
-      <Link to="/catalogo" className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow flex items-start gap-4 border-l-4 border-gray-400">
-        <Battery className="w-8 h-8 text-gray-500 flex-shrink-0" />
-        <div>
-          <h3 className="font-bold text-lg">Catálogo</h3>
-          <p className="text-sm text-gray-600">Catálogo de productos Eternity con especificaciones.</p>
-        </div>
-      </Link>
-
       <Link to="/h1" className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow flex items-start gap-4 border-l-4 border-red-500">
         <FileText className="w-8 h-8 text-red-500 flex-shrink-0" />
         <div>
@@ -175,7 +167,7 @@ function AppContent() {
       <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 relative">
         {/* Logo PELSA - Esquina superior izquierda (+25%) */}
         <div className="absolute top-4 left-4 h-20 z-20 pointer-events-none">
-          <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-full object-contain opacity-80" />
+          <img src="/logos/pelsa-logo.PNG" alt="PELSA" className="h-full object-contain opacity-80" />
         </div>
 
         {/* Logo Eternity - Esquina superior derecha */}

@@ -40,7 +40,7 @@ export function Login() {
       <div className="bg-teal-50 border-b-2 border-cyan-300">
         <div className="flex justify-between items-center px-8 py-6 gap-4">
           <img src="/logos/balore-logo.png" alt="Balore" className="h-16 object-contain" />
-          <img src="/logos/pelsa-logo.jpeg" alt="PELSA" className="h-16 object-contain" />
+          <img src="/logos/pelsa-logo.PNG" alt="PELSA" className="h-16 object-contain" />
           <img src="/logos/eternity-logo.png" alt="Eternity" className="h-16 object-contain" />
         </div>
       </div>
