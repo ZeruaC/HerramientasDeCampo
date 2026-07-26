@@ -175,12 +175,14 @@ export const useStore = create<StoreState>((set) => ({
   setEternityInstall: (install) => set({ eternityInstall: install }),
 
   // H4
-  loadPowerW: 3000,
+  loadPowerW: 0,
   setLoadPowerW: (power) => set({ loadPowerW: power }),
-  autonomyReqH4: 8,
+  autonomyReqH4: 0,
   setAutonomyReqH4: (autonomy) => set({ autonomyReqH4: autonomy }),
   systemVoltage: 48,
   setSystemVoltage: (voltage) => set({ systemVoltage: voltage }),
+  // 25°C = "sin derateo" por defecto, no 0: un site real puede estar a 0°C,
+  // así que 0 no sirve como "todavía sin rellenar" para este campo.
   minTempH4: 25,
   setMinTempH4: (temp) => set({ minTempH4: temp }),
   selectedFamilyH4: 'OPzV Standby',

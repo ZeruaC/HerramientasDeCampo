@@ -6,6 +6,7 @@ import { Wrench,  Info, ShieldCheck, Settings } from 'lucide-react';
 
 export const H4 = () => {
   const {
+    audit,
     loadPowerW, setLoadPowerW,
     autonomyReqH4, setAutonomyReqH4,
     systemVoltage, setSystemVoltage,
@@ -17,6 +18,16 @@ export const H4 = () => {
   } = useStore();
 
   const { modelos, familias, loading, error } = useCatalog();
+
+  // La tensión del sistema ya se capturó en H1 (auditoría) — se hereda en vez
+  // de volver a preguntarla.
+  useEffect(() => {
+    const auditVoltage = Number(audit.voltajeSistema);
+    if (auditVoltage > 0 && auditVoltage !== systemVoltage) {
+      setSystemVoltage(auditVoltage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audit.voltajeSistema]);
 
   // Convert modelo objects to format compatible with calculation logic
   const catalogoArray = useMemo(() => {
@@ -52,8 +63,12 @@ export const H4 = () => {
     // 3. Capacidad requerida C (Ah) = E / (V * DOD * Ftemp)
     const C_req = E / (systemVoltage * maxDod * Ftemp);
 
-    // Find models in the selected family
-    const familyModels = catalogoArray.filter(p => p.familia.includes(selectedFamilyH4) || p.subfamilia === selectedFamilyH4);
+    // Find models in the selected family that are electrically valid for this
+    // system voltage (their unit voltage must divide evenly into it).
+    const familyModels = catalogoArray.filter(p =>
+      (p.familia.includes(selectedFamilyH4) || p.subfamilia === selectedFamilyH4) &&
+      systemVoltage % p.v === 0
+    );
     
     // Find suggested model (assuming 1 string for simplicity first)
     // Elements in series = System Voltage / Cell Voltage (usually 2V or 12V)
@@ -110,7 +125,7 @@ export const H4 = () => {
         strings = Math.ceil(C_req / chosenModelObj.ah);
       }
       actualCapacity = chosenModelObj.ah * strings;
-      margin = ((actualCapacity - C_req) / C_req) * 100;
+      margin = C_req > 0 ? ((actualCapacity - C_req) / C_req) * 100 : 0;
     }
 
     return {
@@ -165,6 +180,15 @@ export const H4 = () => {
         </p>
       </div>
 
+      {(loadPowerW <= 0 || autonomyReqH4 <= 0) && (
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3 text-yellow-800">
+          <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <p className="text-sm">
+            Falta <strong>potencia de la carga</strong> y/o <strong>autonomía requerida</strong>. La configuración de abajo es solo un ejemplo hasta que se rellenen con datos reales del cliente.
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Entradas */}
         <div className="lg:col-span-1 space-y-6">
@@ -182,6 +206,7 @@ export const H4 = () => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
                   value={loadPowerW || ''}
                   onChange={(e) => setLoadPowerW(Number(e.target.value))}
+                  placeholder="Mide con pinza amperimétrica"
                 />
               </div>
               <div>
@@ -192,23 +217,36 @@ export const H4 = () => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
                   value={autonomyReqH4 || ''}
                   onChange={(e) => setAutonomyReqH4(Number(e.target.value))}
+                  placeholder="Pregunta al cliente"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tensión del sistema (V DC)</label>
-                <select
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500 bg-white"
-                  value={systemVoltage}
-                  onChange={(e) => setSystemVoltage(Number(e.target.value))}
-                >
-                  <option value={12}>12 V</option>
-                  <option value={24}>24 V</option>
-                  <option value={48}>48 V</option>
-                  <option value={110}>110 V</option>
-                  <option value={125}>125 V</option>
-                  <option value={220}>220 V</option>
-                  <option value={384}>384 V</option>
-                </select>
+                {audit.voltajeSistema ? (
+                  <>
+                    <div className="w-full p-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700 font-semibold">
+                      {systemVoltage} V
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Heredado de H1 · Instalación Actual. Cambiar allí si es necesario.</p>
+                  </>
+                ) : (
+                  <>
+                    <select
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500 bg-white"
+                      value={systemVoltage}
+                      onChange={(e) => setSystemVoltage(Number(e.target.value))}
+                    >
+                      <option value={12}>12 V</option>
+                      <option value={24}>24 V</option>
+                      <option value={48}>48 V</option>
+                      <option value={110}>110 V</option>
+                      <option value={125}>125 V</option>
+                      <option value={220}>220 V</option>
+                      <option value={384}>384 V</option>
+                    </select>
+                    <p className="text-xs text-yellow-600 mt-1">Sin dato en H1 — se puede completar allí para que quede bloqueado aquí.</p>
+                  </>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Temp. mínima de operación (°C)</label>
@@ -217,6 +255,7 @@ export const H4 = () => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
                   value={minTempH4 || ''}
                   onChange={(e) => setMinTempH4(Number(e.target.value))}
+                  placeholder="Temperatura mínima del emplazamiento"
                 />
               </div>
               <div>
@@ -296,7 +335,12 @@ export const H4 = () => {
                     value={selectedModelH4 || calcResults.suggestedModel}
                     onChange={(e) => setSelectedModelH4(e.target.value)}
                   >
-                    {catalogoArray.filter(p => p.familia.includes(selectedFamilyH4) || p.subfamilia === selectedFamilyH4).map(m => (
+                    {catalogoArray
+                      .filter(p =>
+                        (p.familia.includes(selectedFamilyH4) || p.subfamilia === selectedFamilyH4) &&
+                        systemVoltage % p.v === 0
+                      )
+                      .map(m => (
                       <option key={m.modelo} value={m.modelo}>
                         {m.modelo} ({m.ah} Ah) {m.modelo === calcResults.suggestedModel ? '✓ Sugerido' : ''}
                       </option>
