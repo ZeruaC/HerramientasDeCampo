@@ -52,11 +52,12 @@ export const H4 = () => {
     // 1. Energía necesaria E (Wh) = P * t / η
     const E = (loadPowerW * autonomyReqH4) / inverterEfficiency;
     
-    // 2. Factor de temperatura (approx rule of thumb for Lead-Acid)
-    // 25C = 1.0, lower temps reduce capacity (e.g., -0.006 per degree below 25)
+    // 2. Factor de temperatura para plomo-ácido según la curva de la formación
+    // (Fase 1 · 1.4 y Fase 2 · 1.1): 25°C = 100% y 0°C = 50% de capacidad,
+    // es decir, ~2% de pérdida por cada °C por debajo de 25.
     let Ftemp = 1.0;
     if (minTempH4 < 25) {
-      Ftemp = 1.0 - ((25 - minTempH4) * 0.008); // approx 0.8% loss per degree below 25
+      Ftemp = 1.0 - ((25 - minTempH4) * 0.02);
       if (Ftemp < 0.5) Ftemp = 0.5;
     }
     
@@ -253,7 +254,7 @@ export const H4 = () => {
                 <input
                   type="number"
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
-                  value={minTempH4 || ''}
+                  value={minTempH4}
                   onChange={(e) => setMinTempH4(Number(e.target.value))}
                   placeholder="Temperatura mínima del emplazamiento"
                 />

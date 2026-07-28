@@ -69,6 +69,8 @@ interface StoreState {
   setOperationType: (op: string) => void;
   availableSpace: string;
   setAvailableSpace: (space: string) => void;
+  cyclesPerYear: string;
+  setCyclesPerYear: (cycles: string) => void;
   recommendedFamily: string;
   setRecommendedFamily: (family: string) => void;
 
@@ -159,6 +161,8 @@ export const useStore = create<StoreState>((set) => ({
   setOperationType: (op) => set({ operationType: op }),
   availableSpace: 'Reducido',
   setAvailableSpace: (space) => set({ availableSpace: space }),
+  cyclesPerYear: 'Bajo (<500)',
+  setCyclesPerYear: (cycles) => set({ cyclesPerYear: cycles }),
   recommendedFamily: '',
   setRecommendedFamily: (family) => set({ recommendedFamily: family }),
 

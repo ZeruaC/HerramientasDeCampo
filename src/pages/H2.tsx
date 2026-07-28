@@ -14,6 +14,7 @@ export const H2 = () => {
     maintenanceAvailable, setMaintenanceAvailable,
     operationType, setOperationType,
     availableSpace, setAvailableSpace,
+    cyclesPerYear, setCyclesPerYear,
     setRecommendedFamily,
     setSelectedFamilyH4
   } = useStore();
@@ -57,7 +58,7 @@ export const H2 = () => {
       scores['OPzV Solar'] += 2;
       scores['OPzS Solar'] -= 1;
       scores['OPzS Standby'] -= 1;
-      reasons.push("Alta temperatura: OPzV y QUASAR tienen mejor comportamiento térmico.");
+      reasons.push("Alta temperatura: el GEL (OPzV) disipa mejor el calor; se penalizan las inundadas.");
     } else if (maxTemp === '25-35°C') {
       scores['OPzV Standby'] += 1;
       scores['OPzS Solar'] += 1;
@@ -95,6 +96,25 @@ export const H2 = () => {
       scores['QUASAR VRLA'] += 1;
     }
 
+    // Criterio 1 de la matriz de la formación (Fase 2 · 2.1): ciclos/año.
+    // Bajo → familias de flotación · Medio → solar / Larga Duración ·
+    // Alto o multi-turno → QUASAR (carga rápida 4 h, tolerancia a PSoC).
+    if (cyclesPerYear === 'Alto (>1000) / Multi-turno') {
+      scores['QUASAR Estándar'] += 3;
+      scores['QUASAR Flooded Bloc'] += 3;
+      scores['QUASAR Gel Bloc'] += 2;
+      scores['QUASAR VRLA'] += 2;
+      reasons.push("Ciclado alto o multi-turno: QUASAR admite carga rápida (4 h) y ciclos parciales sin sulfatación.");
+    } else if (cyclesPerYear === 'Medio (500-1000)') {
+      scores['OPzV Solar'] += 2;
+      scores['OPzS Solar'] += 2;
+      scores['Larga Duración'] += 2;
+      scores['Gel Solar Bloc'] += 1;
+    } else {
+      scores['OPzV Standby'] += 2;
+      scores['OPzS Standby'] += 2;
+    }
+
     if (autonomyReqH2 === '<2 h (Alta descarga)') {
       scores['QUASAR Estándar'] += 2;
       scores['QUASAR Gel Bloc'] += 1;
@@ -129,7 +149,7 @@ export const H2 = () => {
     });
 
     return { scores, winner, reasons };
-  }, [maxTemp, autonomyReqH2, maintenanceAvailable, operationType, availableSpace]);
+  }, [maxTemp, autonomyReqH2, maintenanceAvailable, operationType, availableSpace, cyclesPerYear]);
 
   useEffect(() => {
     setRecommendedFamily(evaluation.winner);
@@ -207,6 +227,22 @@ export const H2 = () => {
               >
                 <option value="Sí">Sí, personal calificado</option>
                 <option value="No">No, sitio remoto o sin personal</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-red-500" />
+                Ciclos de descarga al año
+              </label>
+              <select
+                className="w-full p-2 border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500"
+                value={cyclesPerYear}
+                onChange={(e) => setCyclesPerYear(e.target.value)}
+              >
+                <option value="Bajo (<500)">Bajo (&lt;500/año — flotación, cortes raros)</option>
+                <option value="Medio (500-1000)">Medio (500–1000/año — ciclado regular)</option>
+                <option value="Alto (>1000) / Multi-turno">Alto (&gt;1000/año) / Multi-turno / Carga de oportunidad</option>
               </select>
             </div>
 

@@ -16,6 +16,7 @@ export interface Proposal {
   maintenance_available?: string;
   operation_type?: string;
   available_space?: string;
+  cycles_per_year?: string;
   outages_per_year?: number;
   duration_hours?: number;
   cost_per_hour?: number;
